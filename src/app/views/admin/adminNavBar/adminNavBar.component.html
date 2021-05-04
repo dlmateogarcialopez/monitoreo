@@ -1,0 +1,21 @@
+<div class="rounded border mb-4 mb-sm-0">
+  <div class="d-flex align-items-center bg-light border-bottom rounded-top p-2">
+    <div class="ml-2 mr-3">
+      <i class="fas fa-cog fa-2x"></i>
+    </div>
+    <div>
+      <div>Configuración</div>
+      <div class="text-muted texto_pequeno">Administrador</div>
+    </div>
+  </div>
+  <ul class="bg-white nav flex-column vertical_nav">
+    <li *ngFor="let ruta of rutas" class="border-bottom nav-item">
+      <a
+        [routerLink]="['../' + ruta]"
+        routerLinkActive="active"
+        class="item nav-link"
+        >{{ ruta | titlecase }}</a
+      >
+    </li>
+  </ul>
+</div>

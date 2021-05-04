@@ -1,0 +1,49 @@
+<div class="row justify-content-center mx-sm-0 mx-3">
+  <div class="col-sm-7 col-md-3 mb-4">
+    <div class="d-flex align-items-center border rounded bg-white shadow">
+      <div class="px-3 py-4 bg_chec_oscuro">
+        <i class="fa fa-envelope fa-fw font-2xl"></i>
+      </div>
+      <div class="px-3">
+        <h5 class="text-info mb-0">
+          {{ totalDefinitivoMensajes }}
+        </h5>
+        <div class="text-muted text-uppercase font-weight-bold font-xs">
+          Mensajes a enviar
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-7 col-md-3 mb-4">
+    <div class="d-flex align-items-center border rounded bg-white shadow">
+      <div class="px-3 py-4 bg_chec_oscuro">
+        <i class="fa fa-dollar-sign fa-fw font-2xl"></i>
+      </div>
+      <div class="px-3">
+        <h5 class="text-info mb-0">
+          {{ valorMensajesAEnviar | currency: "":"$":"1.0-0" }}
+        </h5>
+        <div class="text-muted text-uppercase font-weight-bold font-xs">
+          Valor mensajes
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-7 col-md-3 mb-4">
+    <div class="d-flex align-items-center border rounded bg-white shadow">
+      <div class="px-3 py-4 bg_chec_oscuro">
+        <i class="fa fa-phone fa-fw font-2xl"></i>
+      </div>
+      <div class="px-3">
+        <div class="h5 text-info mb-0">
+          {{ totalDefinitivoCelulares }}
+        </div>
+        <div class="text-muted text-uppercase font-weight-bold font-xs">
+          Celulares válidos
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

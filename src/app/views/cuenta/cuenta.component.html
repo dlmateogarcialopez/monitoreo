@@ -1,0 +1,348 @@
+<div class="container-fluid pb-4">
+  <div class="row">
+    <div class="col-sm col-md-3">
+      <div class="rounded border mb-4 mb-sm-0">
+        <div
+          class="d-flex align-items-center bg-light border-bottom rounded-top p-2"
+        >
+          <div class="ml-2 mr-3">
+            <i class="fas fa-user-circle fa-2x"></i>
+          </div>
+          <div>
+            <div>
+              {{
+                datosUsuarioJWT.nombres + " " + datosUsuarioJWT.apellidos
+                  | titlecase
+              }}
+            </div>
+            <div class="text-muted texto_pequeno">Configuración personal</div>
+          </div>
+        </div>
+        <ul
+          ngbNav
+          #nav="ngbNav"
+          class="nav-pills bg-white"
+          orientation="vertical"
+        >
+          <li ngbNavItem="perfil" class="border-bottom">
+            <a ngbNavLink class="item item_perfil rounded-0">Perfil</a>
+            <ng-template ngbNavContent>
+              <form
+                [formGroup]="formPerfil"
+                (ngSubmit)="actualizarPerfil()"
+                class="form-horizontal"
+              >
+                <h3>Actualizar perfil</h3>
+                <hr class="mt-0" />
+                <div class="form-group row">
+                  <label for="nombres" class="col-md-3 col-form-label"
+                    >Nombres</label
+                  >
+                  <div class="col-md">
+                    <input
+                      type="text"
+                      formControlName="nombres"
+                      name="nombres"
+                      class="form-control"
+                      id="nombres"
+                      placeholder="Nombres"
+                    />
+
+                    <div
+                      *ngIf="
+                        formPerfilControls.nombres.invalid &&
+                        (formPerfilControls.nombres.dirty ||
+                          formPerfilControls.nombres.touched)
+                      "
+                      class="text-center m-0 text-danger texto_pequeno"
+                    >
+                      <span *ngIf="formPerfilControls.nombres.errors.required">
+                        {{ MESSAGES.requerido }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="apellidos" class="col-md-3 col-form-label"
+                    >Apellidos</label
+                  >
+                  <div class="col-md">
+                    <input
+                      type="text"
+                      formControlName="apellidos"
+                      name="apellidos"
+                      class="form-control"
+                      id="apellidos"
+                      placeholder="Apellidos"
+                    />
+
+                    <div
+                      *ngIf="
+                        formPerfilControls.apellidos.invalid &&
+                        (formPerfilControls.apellidos.dirty ||
+                          formPerfilControls.apellidos.touched)
+                      "
+                      class="text-center m-0 text-danger texto_pequeno"
+                    >
+                      <span
+                        *ngIf="formPerfilControls.apellidos.errors.required"
+                      >
+                        {{ MESSAGES.requerido }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="cargo" class="col-md-3 col-form-label"
+                    >Cargo</label
+                  >
+                  <div class="col-md">
+                    <input
+                      type="text"
+                      formControlName="cargo"
+                      name="cargo"
+                      class="form-control"
+                      id="cargo"
+                      placeholder="Cargo"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="correo" class="col-md-3 col-form-label"
+                    >Correo</label
+                  >
+                  <div class="col-md">
+                    <input
+                      type="email"
+                      formControlName="correo"
+                      id="correo"
+                      name="correo"
+                      class="form-control"
+                      placeholder="Correo"
+                    />
+
+                    <div
+                      *ngIf="
+                        formPerfilControls.correo.invalid &&
+                        (formPerfilControls.correo.dirty ||
+                          formPerfilControls.correo.touched)
+                      "
+                      class="text-center m-0 text-danger texto_pequeno"
+                    >
+                      <span *ngIf="formPerfilControls.correo.errors.required">
+                        {{ MESSAGES.requerido }}
+                      </span>
+                      <span *ngIf="formPerfilControls.correo.errors.email">
+                        {{ MESSAGES.email }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                  <button type="submit" class="bg_chec_oscuro px-4" mat-button>
+                    Actualizar
+                  </button>
+                </div>
+              </form>
+            </ng-template>
+          </li>
+          <li ngbNavItem="seguridad">
+            <a ngbNavLink class="item item_seguridad rounded-0">Seguridad</a>
+            <ng-template ngbNavContent>
+              <form
+                [formGroup]="formPassword"
+                (ngSubmit)="actualizarPassword()"
+                class="form-horizontal"
+              >
+                <h3>Actualizar contraseña</h3>
+                <hr class="mt-0" />
+                <div class="form-group row">
+                  <label for="passwordActual" class="col-md-4 col-form-label"
+                    >Contraseña actual</label
+                  >
+                  <div class="col-md">
+                    <div class="input-group">
+                      <input
+                        [type]="hideCurrentPassword ? 'password' : 'text'"
+                        formControlName="passwordActual"
+                        id="passwordActual"
+                        name="passwordActual"
+                        class="form-control"
+                        placeholder="Contraseña actual"
+                      />
+                      <div class="input-group-append">
+                        <span class="input-group-text bg-transparent">
+                          <i
+                            (click)="hideCurrentPassword = !hideCurrentPassword"
+                            [ngClass]="
+                              hideCurrentPassword ? 'fa-eye' : 'fa-eye-slash'
+                            "
+                            [ngbTooltip]="
+                              hideCurrentPassword
+                                ? 'Mostrar contraseña'
+                                : 'Ocultar contraseña'
+                            "
+                            class="fas fa-fw fa-lg cursor_pointer"
+                          ></i>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="
+                        formPasswordControls.passwordActual.invalid &&
+                        (formPasswordControls.passwordActual.dirty ||
+                          formPasswordControls.passwordActual.touched)
+                      "
+                      class="text-center m-0 text-danger texto_pequeno"
+                    >
+                      <span
+                        *ngIf="
+                          formPasswordControls.passwordActual.errors.required
+                        "
+                      >
+                        {{ MESSAGES.requerido }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label for="password" class="col-md-4 col-form-label"
+                    >Nueva contraseña</label
+                  >
+                  <div class="col-md">
+                    <div class="input-group">
+                      <input
+                        [type]="hidePassword ? 'password' : 'text'"
+                        formControlName="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Nueva contraseña"
+                      />
+                      <div class="input-group-append">
+                        <span class="input-group-text bg-transparent">
+                          <i
+                            (click)="hidePassword = !hidePassword"
+                            [ngClass]="hidePassword ? 'fa-eye' : 'fa-eye-slash'"
+                            [ngbTooltip]="
+                              hidePassword
+                                ? 'Mostrar contraseña'
+                                : 'Ocultar contraseña'
+                            "
+                            class="fas fa-fw fa-lg cursor_pointer"
+                          ></i>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="
+                        formPasswordControls.password.invalid &&
+                        (formPasswordControls.password.dirty ||
+                          formPasswordControls.password.touched)
+                      "
+                      class="text-center m-0 text-danger texto_pequeno"
+                    >
+                      <span
+                        *ngIf="formPasswordControls.password.errors.required"
+                      >
+                        {{ MESSAGES.requerido }}
+                      </span>
+                      <span
+                        *ngIf="formPasswordControls.password.errors.minlength"
+                      >
+                        {{ MESSAGES.minLength }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label for="confirmarPassword" class="col-md-4 col-form-label"
+                    >Confirmar contraseña</label
+                  >
+                  <div class="col-md">
+                    <div class="input-group">
+                      <input
+                        [type]="hideConfirmPassword ? 'password' : 'text'"
+                        type="password"
+                        formControlName="confirmarPassword"
+                        id="confirmarPassword"
+                        name="confirmarPassword"
+                        class="form-control"
+                        placeholder="Confirmar contraseña"
+                      />
+                      <div class="input-group-append">
+                        <span class="input-group-text bg-transparent">
+                          <i
+                            (click)="hideConfirmPassword = !hideConfirmPassword"
+                            [ngClass]="
+                              hideConfirmPassword ? 'fa-eye' : 'fa-eye-slash'
+                            "
+                            [ngbTooltip]="
+                              hideConfirmPassword
+                                ? 'Mostrar contraseña'
+                                : 'Ocultar contraseña'
+                            "
+                            class="fas fa-fw fa-lg cursor_pointer"
+                          ></i>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="text-center m-0 text-danger texto_pequeno">
+                      <div
+                        *ngIf="
+                          formPasswordControls.confirmarPassword.invalid &&
+                          (formPasswordControls.confirmarPassword.dirty ||
+                            formPasswordControls.confirmarPassword.touched)
+                        "
+                      >
+                        <span
+                          *ngIf="
+                            formPasswordControls.confirmarPassword.errors
+                              .required
+                          "
+                        >
+                          {{ MESSAGES.requerido }}
+                        </span>
+                      </div>
+
+                      <span *ngIf="formPassword.hasError('noCoinciden')">
+                        {{ MESSAGES.passwordsNoCoinciden }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row align-items-center justify-content-between">
+                  <div class="col-auto">
+                    <a
+                      [routerLink]="['/recuperarCuenta']"
+                      [queryParams]="
+                        datosUsuarioJWT.correo
+                          ? { correo: datosUsuarioJWT.correo }
+                          : null
+                      "
+                      >Olvidé mi contraseña</a
+                    >
+                  </div>
+                  <div class="col-auto mt-2 mt-md-0">
+                    <button type="submit" class="bg_chec_oscuro px-4" mat-button>
+                      Actualizar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </ng-template>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-sm col-md-6">
+      <div [ngbNavOutlet]="nav" class="shadow"></div>
+    </div>
+  </div>
+</div>

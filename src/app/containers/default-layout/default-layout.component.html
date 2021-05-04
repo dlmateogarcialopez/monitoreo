@@ -1,0 +1,149 @@
+<app-header
+  [navbarBrandRouterLink]="['/']"
+  [fixed]="true"
+  [navbarBrandFull]="{
+    src: 'assets/img/chec_logo.png',
+    width: 135,
+    class: 'img-fluid',
+    alt: 'CHEC'
+  }"
+  [navbarBrandMinimized]="{
+    src: 'assets/img/ch_logo_pequeno.png',
+    width: 30,
+    height: 30,
+    alt: 'CHEC'
+  }"
+  [sidebarToggler]="'lg'"
+  [asideMenuToggler]="false"
+  [mobileAsideMenuToggler]="false"
+>
+  <ul class="nav navbar-nav ml-auto">
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a
+        class="nav-link"
+        data-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        dropdownToggle
+        (click)="(false); updateVistaMensajesEnviados()"
+      >
+        <div
+          class="bg-danger avatar"
+          [ngbTooltip]="
+            usuarioActual.nombres + ' ' + usuarioActual.apellidos | titlecase
+          "
+        >
+          {{ usuarioActual.nombres[0] | uppercase }}
+        </div>
+      </a>
+      <div
+        class="dropdown-menu dropdown-menu-right mr-2"
+        *dropdownMenu
+        aria-labelledby="simple-dropdown"
+      >
+        <div class="dropdown-header text-center">
+          <strong>
+            {{
+              usuarioActual.nombres + " " + usuarioActual.apellidos | titlecase
+            }}
+          </strong>
+        </div>
+
+        <!-- *ngIf="permisosUsuario.dodEnviarSms && hola" -->
+
+        <!-- Ocultar si el usuario no puede enviar mensajes o si el porcentaje no es un entero, es decir, si es `NaN` o `Infinity` -->
+        <div
+          *ngIf="permisosUsuario.dodEnviarSms"
+          [class.d-none]="!isPorcentajeMensajesValido"
+        >
+          <div class="py-2 px-3 border-bottom">
+            <cuota-mensajes-usuario
+              (onCuotaMensajesInit)="checkPorcentajeEnviosUsuario($event)"
+              [inputMensajesEnviados]="subjectMensajesEnviados.asObservable()"
+            ></cuota-mensajes-usuario>
+          </div>
+
+          <div class="dropdown-header text-center">
+            <strong>Opciones</strong>
+          </div>
+        </div>
+        <a [routerLink]="['/cuenta']" class="dropdown-item cursor_pointer">
+          <i class="fas fa-user"></i>
+          Cuenta
+        </a>
+        <a
+          *ngIf="permisosUsuario.administrador"
+          [routerLink]="['/admin']"
+          class="dropdown-item cursor_pointer"
+        >
+          <i class="fas fa-cog"></i>
+          Administración
+        </a>
+        <span (click)="logout()" class="dropdown-item cursor_pointer">
+          <i class="fas fa-lock"></i>
+          Cerrar sesión
+        </span>
+      </div>
+    </li>
+  </ul>
+</app-header>
+<div class="app-body">
+  <app-sidebar
+    #appSidebar
+    [fixed]="true"
+    [display]="'lg'"
+    [minimized]="sidebarMinimized"
+    (minimizedChange)="toggleMinimize($event)"
+  >
+    <app-sidebar-nav
+      [navItems]="navItems"
+      [perfectScrollbar]
+      [disabled]="appSidebar.minimized"
+    ></app-sidebar-nav>
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+  <!-- Main content -->
+  <main class="main">
+    <!-- Breadcrumb -->
+    <cui-breadcrumb>
+      <!-- Breadcrumb Menu-->
+      <li class="breadcrumb-menu" class="d-none"> <!-- AOD Eliminar `d-none` cuando se habilite DOD en producción -->
+        <!-- Mostrar información de la bolsa de mensajes, solo si el usuario tiene permisos de envío y si la bolsa es `UM` -->
+        <span
+          *ngIf="
+            permisosUsuario.dodEnviarSms && permisosUsuario.selectBolsa === 'UM'
+          "
+          ngbTooltip="Bolsa de mensajes"
+          container="body"
+        >
+          <img
+            src="assets/img/dollar-bag.png"
+            alt="Bolsa de mensajes"
+            style="height: 20px"
+          />
+          <bolsa-mensajes></bolsa-mensajes>
+        </span>
+        <!-- d-md-down-none -->
+      </li>
+    </cui-breadcrumb>
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div>
+    <!-- /.container-fluid -->
+  </main>
+</div>
+<app-footer>
+  <span>
+    <a
+      href="http://datalabconsulting.com.co/"
+      target="_blank"
+      rel="noopener noreferrer"
+      >DataLab</a
+    >
+    &copy; {{ currentYear }}
+  </span>
+  <span class="ml-auto"> </span>
+</app-footer>
+<app-toasts aria-live="polite" aria-atomic="true"></app-toasts>

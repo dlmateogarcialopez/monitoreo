@@ -1,0 +1,1004 @@
+<div class="jumbotron px-4 canvas_div_pdf" *ngIf="isVistaCargada">
+  <div class="d-flex justify-content-between align-items-center">
+    <div></div>
+    <h1 class="text-center m-0">Monitoreo - Contact center</h1>
+    <button type="button" class="btn p-0" (click)="getPDF()">
+      <i class="icon-cloud-download iconDescargas"></i>
+    </button>
+  </div>
+
+  <hr class="w-50" />
+  <!--
+      <div class="col-lg-10">
+        <div class="row col-lg-12">
+          <div class="row col-lg-3 d-flex flex-column">
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label for="ccmonth">Municipio</label>
+                <select class="form-control" name="miselect" [(ngModel)]="municipio" (change)="change()">
+                  <option value="Todos">Todos</option>
+                  <option [value]="item.MUNICIPIO" *ngFor="let item of municipios">{{item.MUNICIPIO}}</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="ccyear">Ubicación</label>
+                <select class="form-control" name="miselect" [(ngModel)]="ubicacion" (change)="change()">
+                  <option value="Todos">Todos</option>
+                  <option value="u">Urbano</option>
+                  <option value="r">Rural</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row col-lg-8 d-flex flex-column ml-3">
+            <div class="d-flex flex-end">
+              <label for="ccmonth">Selecciona período de tiempo</label>
+            </div>
+            <div class="d-flex">
+              <input class="form-control col-lg-4" ngxDaterangepickerMd matInput opens='right' showCancel="true"
+                placeholder="Selecciona una Fecha" [(ngModel)]="selected" [showDropdowns]="true" [lockStartDate]="false"
+                [customRangeDirection]="false" (change)="change()" />
+              <label class="icon-date-range-picker-icon fa fa-calendar"></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    -->
+  <div class="row mt-5 mb-3">
+    <div class="col-sm-4 col-md-3">
+      <form [formGroup]="dateForm2">
+        <mat-form-field class="w-100">
+          <mat-label>Periodo</mat-label>
+          <input
+            matInput
+            [satDatepicker]="picker"
+            formControlName="date"
+            (dateChange)="change()"
+          />
+          <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+          <sat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></sat-datepicker-toggle>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <div class="col-sm-4 col-md-3">
+      <mat-form-field class="w-100">
+        <mat-label>Municipio</mat-label>
+        <mat-select [(ngModel)]="municipio" (selectionChange)="change()">
+          <mat-option value="Todos">Todos</mat-option>
+          <mat-option
+            [value]="item.MUNICIPIO"
+            *ngFor="let item of municipios"
+            >{{ item.MUNICIPIO }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-sm-4 col-md-3">
+      <mat-form-field class="w-100">
+        <mat-label>Ubicación</mat-label>
+        <mat-select [(ngModel)]="ubicacion" (selectionChange)="change()">
+          <mat-option value="Todos">Todos</mat-option>
+          <mat-option value="u">Urbano</mat-option>
+          <mat-option value="r">Rural</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="card shadow" id="tablaGeneralContact">
+    <div class="card-body">
+      <div class="row justify-content-between">
+        <div class="col-md-auto">
+          <button
+            type="button"
+            class="btn p-0"
+            (click)="contact('tablaGeneralContact')"
+          >
+            <i class="icon-cloud-download iconDescargas"></i>
+          </button>
+        </div>
+        <div class="col-sm">
+          <h4 class="card-title text-center mb-0">
+            Fuentes por {{ flag | lowercase }}
+          </h4>
+        </div>
+
+        <div class="col-md-auto">
+          <div class="d-flex flex-column">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button
+                type="button"
+                class="btn btn-outline-dark"
+                [class.btn-secondary]="mes"
+                (click)="tablaMes()"
+              >
+                Mes
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-dark"
+                [class.btn-secondary]="semana"
+                (click)="tablaSemana()"
+              >
+                Semana
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-dark"
+                [class.btn-secondary]="dia"
+                (click)="tablaDia()"
+              >
+                Día
+              </button>
+            </div>
+
+            <div class="mt-2">
+              <!--meses-->
+              <div *ngIf="mes == true">
+                <mat-form-field class="w-100">
+                  <mat-label>Año</mat-label>
+                  <input matInput [matDatepicker]="dp" [formControl]="date" />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="dp"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker
+                    #dp
+                    startView="multi-year"
+                    (yearSelected)="changeMes($event, dp)"
+                    panelClass="example-month-picker"
+                  >
+                  </mat-datepicker>
+                </mat-form-field>
+                <!--<button *ngIf="calendarMes==true" class="btn btn-success" (click)="changeMes($event, dp)">mes</button>-->
+              </div>
+              <!--meses-->
+
+              <!--dias-->
+              <div *ngIf="dia == true">
+                <mat-form-field class="w-100">
+                  <mat-label>Mes</mat-label>
+                  <input matInput [matDatepicker]="dp" [formControl]="date" />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="dp"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker
+                    #dp
+                    startView="multi-year"
+                    (yearSelected)="chosenYearHandler2($event)"
+                    (monthSelected)="chosenMonthHandler($event, dp)"
+                    panelClass="example-month-picker"
+                  >
+                  </mat-datepicker>
+                </mat-form-field>
+              </div>
+              <!--dias-->
+
+              <!--semanas-->
+              <form *ngIf="semana == true" [formGroup]="dateForm">
+                <mat-form-field class="w-100">
+                  <input
+                    disabled="{{ habilitarCalendario }}"
+                    matInput
+                    placeholder="Fecha"
+                    [satDatepicker]="picker"
+                    formControlName="date"
+                    (dateChange)="changeSemana()"
+                  />
+                  <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+                  <sat-datepicker-toggle
+                    matSuffix
+                    [for]="picker"
+                  ></sat-datepicker-toggle>
+                </mat-form-field>
+              </form>
+              <!--semanas-->
+            </div>
+          </div>
+        </div>
+        <!--/.col-->
+      </div>
+      <!--/.row-->
+      <ng-container
+        *ngIf="isLoadingFuentesContact; else templateFuentesLlamadas"
+      >
+        <div class="d-flex justify-content-center">
+          <span class="spinner-border blue_spinner"></span>
+        </div>
+      </ng-container>
+      <ng-template #templateFuentesLlamadas>
+        <div class="chart-wrapper" style="height: 300px; margin-top: 40px">
+          <canvas
+            baseChart
+            class="chart"
+            [datasets]="mainChartData"
+            [labels]="mainChartLabels"
+            [options]="mainChartOptions"
+            [colors]="mainChartColours"
+            legend="true"
+            [chartType]="mainChartType"
+          ></canvas>
+        </div>
+      </ng-template>
+    </div>
+    <div class="card-footer">
+      <div class="row text-center">
+        <div class="col-sm-12 col-md mb-sm-2 mb-0">
+          <div class="text-muted">Llamadas entrantes</div>
+          <div class="progress progress-xs mt-2">
+            <div
+              class="progress-bar w-100"
+              role="progressbar"
+              [style.backgroundColor]="mainChartColours[0].borderColor"
+            ></div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md mb-sm-2 mb-0">
+          <div class="text-muted">Llamadas contestadas</div>
+          <div class="progress progress-xs mt-2">
+            <div
+              class="progress-bar w-100"
+              role="progressbar"
+              [style.backgroundColor]="mainChartColours[1].borderColor"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--indicadores-->
+  <div class="card shadow" id="indicadores">
+    <div
+      class="card-header d-flex justify-content-between align-items-center bg_chec_oscuro"
+    >
+      <div></div>
+      <div>
+        <h5 class="m-0 p-0">Indicadores</h5>
+      </div>
+      <div>
+        <button type="button" class="btn p-0" (click)="contact('indicadores')">
+          <i class="icon-cloud-download iconDescargas text-white"></i>
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row justify_content_evenly">
+        <div class="col-sm-4 col-md-2" id="nivelEficacia">
+          <div class="card shadow">
+            <div class="card-body">
+              <div class="text-right mb-2">
+                <button
+                  type="button"
+                  class="btn p-0"
+                  (click)="contact('nivelEficacia')"
+                >
+                  <i class="icon-cloud-download iconDescargas"></i>
+                </button>
+              </div>
+              <div class="h4 mb-0">{{ por_eficacia }}%</div>
+              <small class="text-muted text-uppercase font-weight-bold"
+                >Nivel de eficacia</small
+              >
+              <div class="progress progress-xs mt-3 mb-0">
+                <div
+                  class="progress-bar bg-success"
+                  role="progressbar"
+                  [style.width.%]="por_eficacia"
+                  [attr.aria-valuenow]="por_eficacia"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2" id="abandono">
+          <div class="card shadow">
+            <div class="card-body">
+              <div class="text-right mb-2">
+                <button
+                  type="button"
+                  class="btn p-0"
+                  (click)="contact('abandono')"
+                >
+                  <i class="icon-cloud-download iconDescargas"></i>
+                </button>
+              </div>
+              <div class="h4 mb-0">{{ por_abandono }}%</div>
+              <small class="text-muted text-uppercase font-weight-bold"
+                >Abandono</small
+              >
+              <div class="progress progress-xs mt-3 mb-0">
+                <div
+                  class="progress-bar bg-warning"
+                  role="progressbar"
+                  [style.width.%]="por_abandono"
+                  [attr.aria-valuenow]="por_abandono"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2" id="nivelServicio">
+          <div class="card shadow">
+            <div class="card-body">
+              <div class="text-right mb-2">
+                <button
+                  type="button"
+                  class="btn p-0"
+                  (click)="contact('nivelServicio')"
+                >
+                  <i class="icon-cloud-download iconDescargas"></i>
+                </button>
+              </div>
+              <div class="h4 mb-0">{{ por_nivel_servicio }}%</div>
+              <small class="text-muted text-uppercase font-weight-bold"
+                >Nivel de servicio</small
+              >
+              <div class="progress progress-xs mt-3 mb-0">
+                <div
+                  class="progress-bar bg-info"
+                  role="progressbar"
+                  [style.width.%]="por_nivel_servicio"
+                  [attr.aria-valuenow]="por_nivel_servicio"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h5 class="text-center">Contactabilidad</h5>
+      <div class="row justify-content-center">
+        <div class="col-md-3" id="cuentasValidas">
+          <div class="brand-card shadow">
+            <div class="bg_chec_oscuro p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i
+                    class="fas fa-info-circle mr-1"
+                    data-toggle="tooltip"
+                    title="Del total de llamadas recibidas por el Call Center, cuántas tienen número de cuenta válido"
+                  ></i>
+                  Llamadas solo con cuentas válidas
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn p-0"
+                    (click)="contact('cuentasValidas')"
+                  >
+                    <i class="icon-cloud-download text-white"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="brand-card-body">
+              <ng-container *ngIf="isLoading; else cardCuentasValidas">
+                <div>
+                  <span class="spinner-border blue_spinner"></span>
+                </div>
+              </ng-container>
+              <ng-template #cardCuentasValidas>
+                <div>
+                  <div class="text-value">
+                    {{
+                      llamadasCuentasValidas.num_cuentas_validas
+                        | number: "":"es-CO"
+                    }}
+                  </div>
+                  <div class="text-uppercase text-muted small">Llamadas</div>
+                </div>
+                <div>
+                  <div class="text-value">
+                    {{ llamadasCuentasValidas.por_cuentas_validas }}%
+                  </div>
+                  <div class="text-uppercase text-muted small">Porcentaje</div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" id="telefonosValidos">
+          <div class="brand-card shadow">
+            <div class="bg_chec_oscuro p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i
+                    class="fas fa-info-circle mr-1"
+                    data-toggle="tooltip"
+                    title="Del total de llamadas recibidas por el Call Center, cuántas tienen número de teléfono válido"
+                  ></i>
+                  Llamadas solo con teléfonos válidos
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn p-0"
+                    (click)="contact('telefonosValidos')"
+                  >
+                    <i class="icon-cloud-download text-white"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!--
+                  <div class="chart-wrapper">
+                    <canvas baseChart class="chart" [datasets]="brandBoxChartData1"
+                      [labels]="brandBoxChartLabels1" [options]="brandBoxChartOptions1"
+                      [colors]="brandBoxChartColours1" [legend]="brandBoxChartLegend1"
+                      [chartType]="brandBoxChartType1"></canvas>
+                  </div>-->
+            </div>
+            <div class="brand-card-body">
+              <ng-container *ngIf="isLoading; else cardTelefonosValidos">
+                <div>
+                  <span class="spinner-border blue_spinner"></span>
+                </div>
+              </ng-container>
+              <ng-template #cardTelefonosValidos>
+                <div>
+                  <div class="text-value">
+                    {{
+                      llamadasTelefonosValidas.num_telefonos_validos
+                        | number: "":"es-CO"
+                    }}
+                  </div>
+                  <div class="text-uppercase text-muted small">Llamadas</div>
+                </div>
+                <div>
+                  <div class="text-value">
+                    {{ llamadasTelefonosValidas.por_telefonos_validos }}%
+                  </div>
+                  <div class="text-uppercase text-muted small">Porcentaje</div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" id="cuentasTelefonosValidos">
+          <div class="brand-card shadow">
+            <div class="bg_chec_oscuro p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i
+                    class="fas fa-info-circle mr-1"
+                    data-toggle="tooltip"
+                    title="Del total de llamadas recibidas por el Call Center, cuántas tienen número de cuenta y número de teléfono válido."
+                  ></i>
+                  Llamadas con cuentas y teléfonos válidos
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn p-0"
+                    (click)="contact('cuentasTelefonosValidos')"
+                  >
+                    <i class="icon-cloud-download text-white"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="brand-card-body">
+              <ng-container *ngIf="isLoading; else cardTelefonosCuentasValidas">
+                <div>
+                  <span class="spinner-border blue_spinner"></span>
+                </div>
+              </ng-container>
+              <ng-template #cardTelefonosCuentasValidas>
+                <div>
+                  <div class="text-value">
+                    {{
+                      llamadasTelefonosCuentasValidas.num_total_validos
+                        | number: "":"es-CO"
+                    }}
+                  </div>
+                  <div class="text-uppercase text-muted small">Llamadas</div>
+                </div>
+                <div>
+                  <div class="text-value">
+                    {{ llamadasTelefonosCuentasValidas.por_total_validos }}%
+                  </div>
+                  <div class="text-uppercase text-muted small">Porcentaje</div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-md-3" id="nuevasCuentas">
+          <div class="brand-card shadow">
+            <div class="bg_chec_oscuro p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i
+                    class="fas fa-info-circle mr-1"
+                    data-toggle="tooltip"
+                    title="De las llamadas, cuántas hacen referencia a cuentas nuevas."
+                  ></i>
+                  Nuevas cuentas
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn p-0"
+                    (click)="contact('nuevasCuentas')"
+                  >
+                    <i class="icon-cloud-download text-white"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="brand-card-body">
+              <ng-container *ngIf="isLoading; else cardNuevasCuentas">
+                <div>
+                  <span class="spinner-border blue_spinner"></span>
+                </div>
+              </ng-container>
+              <ng-template #cardNuevasCuentas>
+                <div>
+                  <div class="text-value">
+                    {{ nuevasCuentas.num_total_nuevas | number: "":"es-CO" }}
+                  </div>
+                  <div class="text-uppercase text-muted small">Llamadas</div>
+                </div>
+                <div>
+                  <div class="text-value">
+                    {{ nuevasCuentas.por_total_neuvas }}%
+                  </div>
+                  <div class="text-uppercase text-muted small">Porcentaje</div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3" id="modificaciones">
+          <div class="brand-card shadow">
+            <div class="bg_chec_oscuro p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i
+                    class="fas fa-info-circle mr-1"
+                    data-toggle="tooltip"
+                    title="De las llamadas, cuántas hacen referencia a cuentas existentes en los registros con número de teléfono diferente."
+                  ></i>
+                  Modificaciones
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn p-0"
+                    (click)="contact('modificaciones')"
+                  >
+                    <i class="icon-cloud-download text-white"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="brand-card-body">
+              <ng-container
+                *ngIf="isLoadingModificaciones; else cardModificaciones"
+              >
+                <div>
+                  <span class="spinner-border blue_spinner"></span>
+                </div>
+              </ng-container>
+              <ng-template #cardModificaciones>
+                <div>
+                  <div class="text-value">
+                    {{
+                      modificaciones.num_total_modificaciones
+                        | number: "":"es-CO"
+                    }}
+                  </div>
+                  <div class="text-uppercase text-muted small">Llamadas</div>
+                </div>
+                <div>
+                  <div class="text-value">
+                    {{ modificaciones.por_total_modificaciones }}%
+                  </div>
+                  <div class="text-uppercase text-muted small">Porcentaje</div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3" id="confirmaciones">
+          <div class="brand-card shadow">
+            <div class="bg_chec_oscuro p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i
+                    class="fas fa-info-circle mr-1"
+                    data-toggle="tooltip"
+                    title="De las llamadas, cuántas hacen referencia a cuentas - teléfonos existentes en los registros."
+                  ></i>
+                  Confirmaciones
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn p-0"
+                    (click)="contact('confirmaciones')"
+                  >
+                    <i class="icon-cloud-download text-white"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="brand-card-body">
+              <ng-container
+                *ngIf="isLoadingConfirmaciones; else cardConfirmaciones"
+              >
+                <div>
+                  <span class="spinner-border blue_spinner"></span>
+                </div>
+              </ng-container>
+              <ng-template #cardConfirmaciones>
+                <div>
+                  <div class="text-value">
+                    {{
+                      confirmaciones.num_total_confirmaciones
+                        | number: "":"es-CO"
+                    }}
+                  </div>
+                  <div class="text-uppercase text-muted small">Llamadas</div>
+                </div>
+                <div>
+                  <div class="text-value">
+                    {{ confirmaciones.por_total_confirmaciones }}%
+                  </div>
+                  <div class="text-uppercase text-muted small">Porcentaje</div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="card shadow">
+    <div class="card-header">
+      <div class="d-flex justify-content-between">
+        <div></div>
+        <div></div>
+        <div>
+          <button
+            type="button"
+            class="btn p-0"
+            (click)="contact('indicadores')"
+          >
+            <i class="icon-cloud-download iconDescargas"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card body">
+      <div class="animated fadeIn m-2">
+        <div class="card">
+          <div class="card-header">Contactabilidad</div>
+          <div class="card-body">
+            <div class="row justify-content-center">
+              <div class="col-md-3" id="cuentasValidas">
+                <div class="brand-card shadow">
+                  <div class="bg-success p-3">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <div>Llamadas solo con cuentas válidas</div>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn p-0"
+                          (click)="contact('cuentasValidas')"
+                        >
+                          <i class="icon-cloud-download text-white"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="brand-card-body">
+                    <ng-container *ngIf="isLoading; else cardCuentasValidas">
+                      <div>
+                        <span class="spinner-border blue_spinner"></span>
+                      </div>
+                    </ng-container>
+                    <ng-template #cardCuentasValidas>
+                      <div>
+                        <div class="text-value">
+                          {{
+                            llamadasCuentasValidas.num_cuentas_validas
+                              | number: "":"es-CO"
+                          }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Llamadas
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-value">
+                          {{ llamadasCuentasValidas.por_cuentas_validas }}%
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Porcentaje
+                        </div>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3" id="telefonosValidos">
+                <div class="brand-card shadow">
+                  <div class="bg-success p-3">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <div>Llamadas solo con teléfonos válidos</div>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn p-0"
+                          (click)="contact('telefonosValidos')"
+                        >
+                          <i class="icon-cloud-download text-white"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="brand-card-body">
+                    <ng-container *ngIf="isLoading; else cardTelefonosValidos">
+                      <div>
+                        <span class="spinner-border blue_spinner"></span>
+                      </div>
+                    </ng-container>
+                    <ng-template #cardTelefonosValidos>
+                      <div>
+                        <div class="text-value">
+                          {{
+                            llamadasTelefonosValidas.num_telefonos_validos
+                              | number: "":"es-CO"
+                          }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Llamadas
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-value">
+                          {{ llamadasTelefonosValidas.por_telefonos_validos }}%
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Porcentaje
+                        </div>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3" id="cuentasTelefonosValidos">
+                <div class="brand-card shadow">
+                  <div class="bg-success p-3">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <div>Llamadas con cuentas y teléfonos válidos</div>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn p-0"
+                          (click)="contact('cuentasTelefonosValidos')"
+                        >
+                          <i class="icon-cloud-download text-white"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="brand-card-body">
+                    <ng-container
+                      *ngIf="isLoading; else cardTelefonosCuentasValidas"
+                    >
+                      <div>
+                        <span class="spinner-border blue_spinner"></span>
+                      </div>
+                    </ng-container>
+                    <ng-template #cardTelefonosCuentasValidas>
+                      <div>
+                        <div class="text-value">
+                          {{
+                            llamadasTelefonosCuentasValidas.num_total_validos
+                              | number: "":"es-CO"
+                          }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Llamadas
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-value">
+                          {{
+                            llamadasTelefonosCuentasValidas.por_total_validos
+                          }}%
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Porcentaje
+                        </div>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row justify-content-center">
+              <div class="col-md-3" id="nuevasCuentas">
+                <div class="brand-card shadow">
+                  <div class="bg-success p-3">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <div>Nuevas cuentas</div>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn p-0"
+                          (click)="contact('nuevasCuentas')"
+                        >
+                          <i class="icon-cloud-download text-white"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="brand-card-body">
+                    <ng-container *ngIf="isLoading; else cardNuevasCuentas">
+                      <div>
+                        <span class="spinner-border blue_spinner"></span>
+                      </div>
+                    </ng-container>
+                    <ng-template #cardNuevasCuentas>
+                      <div>
+                        <div class="text-value">
+                          {{
+                            nuevasCuentas.num_total_nuevas | number: "":"es-CO"
+                          }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Llamadas
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-value">
+                          {{ nuevasCuentas.por_total_neuvas }}%
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Porcentaje
+                        </div>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3" id="modificaciones">
+                <div class="brand-card shadow">
+                  <div class="bg-success p-3">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <div>Modificaciones</div>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn p-0"
+                          (click)="contact('modificaciones')"
+                        >
+                          <i class="icon-cloud-download text-white"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="brand-card-body">
+                    <ng-container
+                      *ngIf="isLoadingModificaciones; else cardModificaciones"
+                    >
+                      <div>
+                        <span class="spinner-border blue_spinner"></span>
+                      </div>
+                    </ng-container>
+                    <ng-template #cardModificaciones>
+                      <div>
+                        <div class="text-value">
+                          {{
+                            modificaciones.num_total_modificaciones
+                              | number: "":"es-CO"
+                          }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Llamadas
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-value">
+                          {{ modificaciones.por_total_modificaciones }}%
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Porcentaje
+                        </div>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3" id="confirmaciones">
+                <div class="brand-card shadow">
+                  <div class="bg-success p-3">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <div>Confirmaciones</div>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn p-0"
+                          (click)="contact('confirmaciones')"
+                        >
+                          <i class="icon-cloud-download text-white"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="brand-card-body">
+                    <ng-container
+                      *ngIf="isLoadingConfirmaciones; else cardConfirmaciones"
+                    >
+                      <div>
+                        <span class="spinner-border blue_spinner"></span>
+                      </div>
+                    </ng-container>
+                    <ng-template #cardConfirmaciones>
+                      <div>
+                        <div class="text-value">
+                          {{
+                            confirmaciones.num_total_confirmaciones
+                              | number: "":"es-CO"
+                          }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Llamadas
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-value">
+                          {{ confirmaciones.por_total_confirmaciones }}%
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                          Porcentaje
+                        </div>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</div>

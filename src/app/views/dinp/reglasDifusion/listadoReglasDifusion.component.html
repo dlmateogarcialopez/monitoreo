@@ -1,0 +1,337 @@
+<div class="row animated fadeIn">
+  <div *ngFor="let regla of reglasDifusion" class="col-sm-6 col-md-4">
+    <div class="card">
+      <div class="card-header" style="padding: 0.75rem 1.25rem !important">
+        {{ regla.SEGMENTO }}
+        <div class="card-header-actions" style="height: 21px">
+          <label
+            class="switch switch-sm switch-pill switch-label switch-success mb-0"
+          >
+            <input
+              type="checkbox"
+              class="switch-input"
+              [checked]="regla.ESTADO"
+            />
+            <span
+              class="switch-slider"
+              data-checked="On"
+              data-unchecked="Off"
+            ></span>
+          </label>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row no-gutters justify-content-between">
+          <!-- <div class="col d-block text-truncate">
+            <span class="font-weight-bold"> Clase de servicio: </span>
+            <span class="">
+              {{ regla.CLASE_SERVICIO.join(", ") }}
+            </span>
+          </div>
+          <div class="col-auto pl-3">
+            <span class="link"> Ver más </span>
+          </div> -->
+          <div class="col-12">
+            <span class="font-weight-bold"> Clase de servicio: </span>
+            <span class="">
+              {{ regla.CLASE_SERVICIO.join(", ") }}
+            </span>
+          </div>
+        </div>
+
+        <div class="row no-gutters justify-content-between">
+          <div class="col-12">
+            <span class="font-weight-bold"> Horario: </span>
+            <span class="">
+              {{ regla.TIPO_HORARIO }}
+            </span>
+          </div>
+        </div>
+
+        <div class="row no-gutters justify-content-between">
+          <div class="col-12 d-block text-truncate">
+            <span class="font-weight-bold"> Hora: </span>
+            <span class="">
+              {{ regla.HORA_INICIO + " - " + regla.HORA_FIN }}
+            </span>
+          </div>
+        </div>
+
+        <div class="row no-gutters justify-content-between">
+          <div class="col d-block text-truncate">
+            <span class="font-weight-bold"> Días: </span>
+            <span class="">
+              {{ regla.TIPO_DIA.join(", ") }}
+            </span>
+          </div>
+          <div class="col-auto pl-3">
+            <span class="link"> Ver más </span>
+          </div>
+        </div>
+
+        <div class="row no-gutters justify-content-between">
+          <div class="col d-block text-truncate">
+            <span class="font-weight-bold"> Municipios: </span>
+            <span class="">
+              {{ regla.MUNICIPIO.join(", ") }}
+            </span>
+          </div>
+          <div class="col-auto pl-3">
+            <span class="link"> Ver más </span>
+          </div>
+        </div>
+
+        <div class="row no-gutters justify-content-between">
+          <div class="col-12">
+            <span class="font-weight-bold"> Minutos: </span>
+            <span class="">
+              {{ regla.MINUTOS }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer py-1">
+        <button mat-icon-button ngbTooltip="Editar" container="body">
+          <mat-icon class="big">edit</mat-icon>
+        </button>
+        |
+        <button mat-icon-button ngbTooltip="Eliminar" container="body">
+          <mat-icon class="big">delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="animated fadeIn mat-elevation-z8 m-2">
+  <div
+    class="d-flex justify-content-between align-items-center bg-white py-2 px-3"
+  >
+    <h5 class="m-0">Reglas de difusión</h5>
+    <div class="d-flex align-items-center">
+      <div class="mr-3">
+        <input
+          class="form-control"
+          placeholder="Buscar"
+          (input)="ServiceProvider.aplicarFiltroTabla($event, dataSource)"
+          #inputFiltro
+        />
+      </div>
+
+      <div class="btn-group" dropdown placement="bottom right">
+        <a
+          mat-mini-fab
+          ngbTooltip="Agregar envío"
+          dropdownToggle
+          class="boton_redondo boton_chec"
+        >
+          <i class="fas fa-plus"></i>
+        </a>
+        <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+          <li role="menuitem">
+            <a [routerLink]="['../enviar-archivo']" class="dropdown-item"
+              >Enviar desde archivo</a
+            >
+          </li>
+          <li role="menuitem">
+            <a [routerLink]="['../enviar-bd']" class="dropdown-item"
+              >Enviar desde BD</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <table
+    class="mat-elevation-z8"
+    mat-table
+    [dataSource]="dataSource"
+    multiTemplateDataRows
+    matSort
+  >
+    <ng-container matColumnDef="SEGMENTO">
+      <th class="px-2" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Segmento
+      </th>
+      <td class="px-2" mat-cell *matCellDef="let datosRegla">
+        <span
+          class="d-block text-truncate"
+          [ngbTooltip]="datosRegla.SEGMENTO"
+          container="body"
+        >
+          <span *ngFor="let segmento of datosRegla.SEGMENTO">
+            {{ segmento + "\n" }}
+          </span>
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="CLASE_SERVICIO">
+      <th class="px-2" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Clase de servicio
+      </th>
+      <td class="px-2" mat-cell *matCellDef="let datosRegla">
+        <span
+          class="d-block text-truncate"
+          [ngbTooltip]="datosRegla.CLASE_SERVICIO"
+          container="body"
+        >
+          <span *ngFor="let claseServicio of datosRegla.CLASE_SERVICIO">
+            {{ claseServicio + "\n" }}
+          </span>
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="HORA_INICIO">
+      <th class="px-2" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Horario
+      </th>
+      <td class="px-2" mat-cell *matCellDef="let datosRegla">
+        <span
+          class="d-block text-truncate"
+          [ngbTooltip]="datosRegla.HORA_INICIO + ' - ' + datosRegla.HORA_FIN"
+          container="body"
+        >
+          {{ datosRegla.HORA_INICIO + " - " + datosRegla.HORA_FIN }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="TIPO_DIA">
+      <th class="px-2" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Días
+      </th>
+      <td class="px-2" mat-cell *matCellDef="let datosRegla">
+        <span
+          class="d-block text-truncate"
+          [ngbTooltip]="datosRegla.TIPO_DIA"
+          container="body"
+        >
+          <span *ngFor="let dias of datosRegla.TIPO_DIA">
+            {{ dias + "\n" }}
+          </span>
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="MUNICIPIO">
+      <th class="px-2" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Municipios
+      </th>
+      <td class="px-2" mat-cell *matCellDef="let datosRegla">
+        <span
+          class="d-block text-truncate"
+          [ngbTooltip]="datosRegla.MUNICIPIO"
+          container="body"
+        >
+          <span *ngFor="let municipio of datosRegla.MUNICIPIO">
+            {{ municipio + "\n" }}
+          </span>
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="MINUTOS">
+      <th class="px-1" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Minutos
+      </th>
+      <td class="px-1" mat-cell *matCellDef="let datosRegla">
+        {{ datosRegla.MINUTOS }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="ESTADO">
+      <th class="px-1" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Estado
+      </th>
+      <td class="px-1 py-3" mat-cell *matCellDef="let datosRegla">
+        <label class="switch switch-pill switch-success mb-0">
+          <input
+            type="checkbox"
+            class="switch-input"
+            [checked]="datosRegla.ESTADO"
+          />
+          <span class="switch-slider"></span>
+        </label>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="ACCION">
+      <th class="text-center px-1" mat-header-cell *matHeaderCellDef>Acción</th>
+      <td class="text-center px-1" mat-cell *matCellDef="let datosUsuario">
+        <a
+          [routerLink]="['../add-usuario/' + datosUsuario._id.$oid]"
+          class="bg_ghostwhite"
+          mat-stroked-button
+          ngbTooltip="Editar"
+          container="body"
+        >
+          <i class="fas fa-pen"></i>
+        </a>
+        <button
+          class="bg_ghostwhite"
+          mat-stroked-button
+          ngbTooltip="Eliminar"
+          container="body"
+          (click)="showAdvertenciaEliminarUsuario(datosUsuario._id.$oid)"
+        >
+          <i class="fas fa-trash text-danger"></i>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [attr.colspan]="columnasListadoReglas.length"
+      >
+        <div
+          class="mat_element_detail"
+          [@detailExpand]="
+            element == expandedElement ? 'expanded' : 'collapsed'
+          "
+        >
+          <div class="d-flex align-items-center font_weight_500">Segmento</div>
+          <div class="mat_element_description text-break">
+            {{ element.SEGMENTO }}
+          </div>
+
+          <div class="d-flex align-items-center font_weight_500">Municipios</div>
+          <div class="mat_element_description text-break">
+            {{ element.MUNICIPIO }}
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnasListadoReglas"></tr>
+
+    <tr
+      mat-row
+      *matRowDef="let row; columns: columnasListadoReglas"
+      class="mat_element_row cursor_pointer"
+      [class.mat_expanded_row]="expandedElement === row"
+      (click)="expandedElement = expandedElement === row ? null : row"
+    ></tr>
+
+    <tr
+      mat-row
+      *matRowDef="let row; columns: ['expandedDetail']"
+      class="mat_detail_row"
+    ></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" [attr.colspan]="columnasListadoReglas.length">
+        No existen datos para el término "{{ inputFiltro.value }}"
+      </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 20, 50]"
+    showFirstLastButtons
+  ></mat-paginator>
+</div> -->

@@ -1,0 +1,177 @@
+<div class="shadow m-5">
+  <div
+    class="d-flex justify-content-between align-items-center bg_chec_oscuro py-2 px-3"
+  >
+    <h3 class="m-0">Listado de envíos</h3>
+    <div class="d-flex align-items-center">
+      <div class="mr-3">
+        <input
+          class="form-control"
+          placeholder="Buscar"
+          (input)="ServiceProvider.aplicarFiltroTabla($event, dataSource)"
+          #inputFiltro
+        />
+      </div>
+
+      <div class="btn-group" dropdown placement="bottom right">
+        <button
+          *ngIf="permisosUsuario.dodEnviarSms"
+          mat-icon-button
+          ngbTooltip="Agregar envío"
+          dropdownToggle
+          class="hover_white outline_none"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+        <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+          <li role="menuitem">
+            <a [routerLink]="['../enviar-archivo']" class="dropdown-item"
+              >Enviar desde archivo</a
+            >
+          </li>
+          <li role="menuitem">
+            <a [routerLink]="['../enviar-bd']" class="dropdown-item"
+              >Enviar desde BD</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <table
+    class=""
+    mat-table
+    [dataSource]="dataSource"
+    matSort
+    matSortActive="fecha"
+    matSortDirection="desc"
+  >
+    <ng-container matColumnDef="fecha">
+      <th class="px-4" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Fecha
+      </th>
+      <td
+        class="px-4"
+        mat-cell
+        *matCellDef="let datosEnvio"
+        [ngbTooltip]="
+          datosEnvio.fecha
+            | date: 'MMMM dd, yyyy - hh:mm:ss a':'':'es-CO'
+            | titlecase
+        "
+        container="body"
+      >
+        {{ datosEnvio.fechaMostrar | titlecase }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="nombreUsuario">
+      <th class="px-4" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Usuario
+      </th>
+      <td class="px-4" mat-cell *matCellDef="let datosEnvio">
+        {{ datosEnvio.nombreUsuario | titlecase }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="motivoEnvio">
+      <th class="px-4" mat-header-cell mat-sort-header *matHeaderCellDef>
+        Motivo
+      </th>
+      <td
+        class="px-4"
+        mat-cell
+        *matCellDef="let datosEnvio"
+        [ngbTooltip]="datosEnvio.motivoEnvio | titlecase"
+        container="body"
+      >
+        <span class="d-block text-truncate">
+          {{ datosEnvio.motivoEnvio | titlecase }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="cantidadEnviados">
+      <th
+        class="centrar px-4"
+        mat-header-cell
+        mat-sort-header
+        *matHeaderCellDef
+      >
+        Mensajes enviados
+      </th>
+      <td class="text-center px-4" mat-cell *matCellDef="let datosEnvio">
+        {{ datosEnvio.cantidadEnviados }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="estado">
+      <th
+        class="centrar px-4"
+        mat-header-cell
+        mat-sort-header
+        *matHeaderCellDef
+      >
+        Estado
+      </th>
+      <td class="text-center px-4" mat-cell *matCellDef="let datosEnvio">
+        <span
+          class="p-1 {{
+            datosEnvio.estado === 'Enviado' ? 'bg-success' : 'bg-primary'
+          }}
+          "
+        >
+          {{ datosEnvio.estado }}
+        </span>
+        <span
+          *ngIf="datosEnvio.estado === 'En proceso'"
+          class="spinner-border spinner-border-sm blue_spinner ml-1"
+        ></span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="accion">
+      <th class="text-center px-4" mat-header-cell *matHeaderCellDef>
+        Acción
+      </th>
+      <td class="text-center px-4" mat-cell *matCellDef="let datosEnvio">
+        <a
+          *ngIf="datosEnvio.estado === 'Enviado'; else templateDisabledButton"
+          [routerLink]="['../detalle-envio-dod', datosEnvio.idDetalleEnvio]"
+          mat-icon-button
+          ngbTooltip="Ver detalles"
+          container="body"
+        >
+          <!-- <i class="fas fa-eye fa-lg"></i> -->
+          <mat-icon>visibility</mat-icon>
+        </a>
+
+        <ng-template #templateDisabledButton>
+          <a class="cursor_not_allowed" mat-stroked-button disabled>
+            <i class="fas fa-eye fa-lg"></i>
+          </a>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      class="fila"
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+    ></tr>
+
+    <!-- Fila que se muestra si el filtro de búsqueda no arroja resultados (Solo para Angular Versión 10) -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+        No existen datos para el término "{{ inputFiltro.value }}"
+      </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 20, 50]"
+    showFirstLastButtons
+  ></mat-paginator>
+</div>

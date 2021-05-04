@@ -1,0 +1,859 @@
+<div class="jumbotron px-4 canvas_div_pdf">
+  <div class="d-flex justify-content-between align-items-center">
+    <div></div>
+    <h1 class="text-center m-0">Monitoreo DINP</h1>
+    <button type="button" class="btn p-0" (click)="getPDF()">
+      <i class="icon-cloud-download iconDescargas"></i>
+    </button>
+  </div>
+
+  <hr class="w-50" />
+
+  <div class="row mt-5 mb-3">
+    <div class="col-sm-6 col-md-3">
+      <mat-form-field class="w-100">
+        <mat-label>Regla</mat-label>
+        <mat-select multiple [(ngModel)]="regla" (selectionChange)="change()">
+          <mat-option *ngFor="let reg of reglas" [value]="reg.regla"
+            ><!-- {{ reg.regla }} - -->
+            {{ reg.nombre }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <!--<div class="d-flex flex-end">
+            <label for="ccmonth">Selecciona período de tiempo</label>
+          </div>
+          <div class="d-flex">
+            <input class="form-control col-lg-4" ngxDaterangepickerMd matInput opens='right' showCancel="true"
+              placeholder="Selecciona una Fecha" [(ngModel)]="selected" [showDropdowns]="true" [lockStartDate]="false"
+              [customRangeDirection]="false" (change)="change()" />
+            <label class="icon-date-range-picker-icon fa fa-calendar"></label>
+          </div>-->
+      <form [formGroup]="dateForm">
+        <mat-form-field class="w-100">
+          <input
+            matInput
+            placeholder="Periodo"
+            [satDatepicker]="picker"
+            formControlName="date"
+            (dateChange)="change()"
+          />
+          <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+          <sat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></sat-datepicker-toggle>
+        </mat-form-field>
+      </form>
+    </div>
+  </div>
+
+  <div class="row justify-content-center align-items-center mb-3">
+    <div class="col-md-6" id="totlMensajesEnviados">
+      <div class="card shadow" id="trjdinp">
+        <div class="card-body pb-0">
+          <div class="row">
+            <div class="col">
+              <div class="text-value">
+                {{ difusionTotal | number: "":"es-CO" }}
+              </div>
+
+              <div>
+                Cantidad de mensajes difundidos
+                <i
+                  class="fas fa-info-circle"
+                  data-toggle="tooltip"
+                  title="Total de mensajes difundidos a los usuarios dentro de cada evento validado por las reglas de difusión"
+                ></i>
+              </div>
+            </div>
+            <div class="col-auto">
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="dinp('totlMensajesEnviados')"
+              >
+                <i class="icon-cloud-download iconDescargas"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="row align-items-center">
+            <div class="col">
+              <div
+                *ngIf="isLoadingTotalMensajes; else templateLineChart"
+                class="d-flex justify-content-center py-3"
+              >
+                <span class="spinner-border blue_spinner"></span>
+              </div>
+              <ng-template #templateLineChart>
+                <div class="chart-wrapper mt-3" style="height: 100px">
+                  <canvas
+                    baseChart
+                    class="chart"
+                    [datasets]="lineChart2Data"
+                    [labels]="lineChart2Labels"
+                    [options]="lineChart2Options"
+                    [colors]="lineChart2Colours"
+                    [legend]="lineChart2Legend"
+                    [chartType]="lineChart2Type"
+                  ></canvas>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="brand-card shadow" id="notificacionFaltaEnergia">
+        <div class="bg_chec_oscuro p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>Notif. interrupción no programada</div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="dinp('notificacionFaltaEnergia')"
+              >
+                <i class="icon-cloud-download text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="brand-card-body">
+          <div>
+            <span
+              *ngIf="isLoadingMsjEnviadosEntregados; else templateMsjApertura"
+              class="spinner-border spinner-border-sm blue_spinner"
+            ></span>
+            <ng-template #templateMsjApertura>
+              <div class="text-value">
+                {{ kpisDifusion.msj_enviados_apertura | number: "":"es-CO" }}
+              </div>
+            </ng-template>
+            <div class="text-uppercase text-muted small">SMS enviados</div>
+          </div>
+          <div>
+            <span
+              *ngIf="
+                isLoadingMsjEnviadosEntregados;
+                else templatePorMsjApertura
+              "
+              class="spinner-border spinner-border-sm blue_spinner"
+            ></span>
+            <ng-template #templatePorMsjApertura>
+              <div class="text-value">
+                {{
+                  kpisDifusion.porc_entregados_apertura | number: "":"es-CO"
+                }}%
+              </div>
+            </ng-template>
+            <div class="text-uppercase text-muted small">SMS entregados</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-md-3">
+      <div class="brand-card shadow" id="notificacionReestablecimiento">
+        <div class="bg_chec_oscuro p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>Notif. restablecimiento de servicio</div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="dinp('notificacionReestablecimiento')"
+              >
+                <i class="icon-cloud-download text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="brand-card-body">
+          <div>
+            <span
+              *ngIf="isLoadingMsjEnviadosEntregados; else templateMsjCierre"
+              class="spinner-border spinner-border-sm blue_spinner"
+            ></span>
+            <ng-template #templateMsjCierre>
+              <div class="text-value">
+                {{ kpisDifusion.msj_enviados_cierre | number: "":"es-CO" }}
+              </div>
+            </ng-template>
+            <div class="text-uppercase text-muted small">SMS enviados</div>
+          </div>
+          <div>
+            <span
+              *ngIf="isLoadingMsjEnviadosEntregados; else templatePorMsjCierre"
+              class="spinner-border spinner-border-sm blue_spinner"
+            ></span>
+            <ng-template #templatePorMsjCierre>
+              <div class="text-value">
+                {{ kpisDifusion.porc_entregados_cierre | number: "":"es-CO" }}%
+              </div>
+            </ng-template>
+            <div class="text-uppercase text-muted small">SMS entregados</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <h2 class="text-center">Promoción</h2> -->
+  <div class="row justify-content-center mb-3">
+    <div class="col-sm-6 col-md-5">
+      <div class="card shadow" id="smsPromocion">
+        <div class="row no-gutters">
+          <div
+            class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro"
+          >
+            <i class="fas fa-sms fa-5x"></i>
+          </div>
+          <div class="col-md">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-3">
+                <h5 class="card-title m-0">Mensajes de promoción enviados</h5>
+                <button
+                  type="button"
+                  class="btn p-0"
+                  (click)="dinp('smsPromocion')"
+                >
+                  <i class="icon-cloud-download iconDescargas"></i>
+                </button>
+              </div>
+
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <span class="card-text">
+                  <i class="fas fa-headphones fa-fw"></i>
+                  Lucy
+                </span>
+
+                <span
+                  *ngIf="isLoadingPromocionLucy; else templatePromocionLucy"
+                  class="spinner-border spinner-border-sm blue_spinner"
+                ></span>
+                <ng-template #templatePromocionLucy>
+                  <span class="card-text">
+                    {{ promocion | number: "":"es-CO" }}
+                  </span>
+                </ng-template>
+              </div>
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <span class="card-text">
+                  <i class="fas fa-bolt fa-fw"></i>
+                  Interrupciones programadas
+                </span>
+                <span
+                  *ngIf="
+                    isLoadingPromocionSuspensiones;
+                    else templatePromocionSuspensiones
+                  "
+                  class="spinner-border spinner-border-sm blue_spinner"
+                ></span>
+                <ng-template #templatePromocionSuspensiones>
+                  <span class="card-text">
+                    {{ promocionSuspensiones | number: "":"es-CO" }}
+                  </span>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--
+    <div class="col-md-3">
+      <div class="brand-card shadow" id="promocionLucy">
+        <div class="bg_chec_oscuro p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>Lucy</div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="dinp('promocionLucy')"
+              >
+                <i class="icon-cloud-download text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="brand-card-body">
+          <div>
+            <span
+              *ngIf="isLoadingPromocionLucy; else templatePromocionLucy"
+              class="spinner-border spinner-border-sm blue_spinner"
+            ></span>
+            <ng-template #templatePromocionLucy>
+              <div class="text-value">
+                {{ promocion | number: "":"es-CO" }}
+              </div>
+            </ng-template>
+            <div class="text-uppercase text-muted small">Mensajes Enviados</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="brand-card shadow" id="promocionsuspensiones">
+        <div class="bg_chec_oscuro p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>Interrupciones programadas</div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="dinp('promocionsuspensiones')"
+              >
+                <i class="icon-cloud-download text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="brand-card-body">
+          <div>
+            <span
+              *ngIf="
+                isLoadingPromocionSuspensiones;
+                else templatePromocionSuspensiones
+              "
+              class="spinner-border spinner-border-sm blue_spinner"
+            ></span>
+            <ng-template #templatePromocionSuspensiones>
+              <div class="text-value">
+                {{ promocionSuspensiones | number: "":"es-CO" }}
+              </div>
+            </ng-template>
+            <div class="text-uppercase text-muted small">Mensajes Enviados</div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-lg-6 animated fadeIn" id="mapaDinp">
+      <div class="card shadow">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Municipios</h5>
+            </div>
+            <div>
+              <button type="button" class="btn p-0" (click)="dinp('mapaDinp')">
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div
+          class="card-body overflow-auto d-flex justify-content-center p-0"
+          style="height: 500px"
+        >
+          <div
+            *ngIf="isLoadingMunicipio"
+            class="d-flex justify-content-center align-items-center h-100 p-3"
+          >
+            <span class="spinner-border blue_spinner"></span>
+          </div>
+          <svg class="mapa" id="mapa" [class.d-none]="isLoadingMunicipio"></svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 animated fadeIn" id="msnEnviados">
+      <div class="card shadow" id="card-dinp-regla">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <h5 class="m-0 p-0">Mensajes enviados por regla</h5>
+            <div id="bar_dinp">
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="dinp('msnEnviados')"
+              >
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body" style="height: 500px">
+          <div
+            *ngIf="isLoadingReglas; else templateMsjReglas"
+            class="d-flex justify-content-center align-items-center h-100"
+          >
+            <span class="spinner-border blue_spinner"></span>
+          </div>
+          <ng-template #templateMsjReglas>
+            <ng-template #tituloPopover>
+              <div class="d-flex justify-content-between align-items-center">
+                <strong>Reglas de difusión</strong>
+                <button
+                  type="button"
+                  class="close text-white"
+                  aria-label="Close"
+                  (click)="pop.close()"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </ng-template>
+            <ng-template #contenidoPopover>
+              <div
+                class="accordion overflow-auto"
+                id="acordeon"
+                style="height: 200px; width: 250px"
+              >
+                <div
+                  *ngFor="let regla of reglasDifusion; let i = index"
+                  class="card mb-0"
+                >
+                  <div
+                    class="card-header bg_ghostwhite reglas_header text-center cursor_pointer"
+                    [id]="'encabezado' + i"
+                    data-toggle="collapse"
+                    [attr.data-target]="'#collapse' + i"
+                    [attr.aria-controls]="'collapse' + i"
+                  >
+                    <h2 class="mb-0">
+                      <button class="btn" type="button">
+                        <i class="fas fa-list-ol mr-2"></i>
+                        Regla {{ regla.REGLA }}
+                      </button>
+                    </h2>
+                  </div>
+
+                  <div
+                    [id]="'collapse' + i"
+                    class="collapse"
+                    [attr.aria-labelledby]="'encabezado' + i"
+                    data-parent="#acordeon"
+                  >
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between mb-2">
+                        <strong class="card-text"> Segmento </strong>
+                        <div class="card-text">
+                          <ng-container
+                            *ngIf="
+                              regla.SEGMENTO.length === 1;
+                              else templateMultiSegmentos
+                            "
+                          >
+                            {{ regla.SEGMENTO }}
+                          </ng-container>
+                          <ng-template #templateMultiSegmentos>
+                            <ul class="collapsed_list text-right m-0 pl-0 pr-4">
+                              <li
+                                *ngFor="let segmento of regla.SEGMENTO"
+                                class="right_to_left"
+                              >
+                                {{ segmento }}
+                              </li>
+                            </ul>
+                          </ng-template>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <strong class="card-text"> Clase de servicio </strong>
+                        <div class="card-text">
+                          <ng-container
+                            *ngIf="
+                              regla.CLASE_SERVICIO.length === 1;
+                              else templateMultiClasesServicio
+                            "
+                          >
+                            {{ regla.CLASE_SERVICIO }}
+                          </ng-container>
+                          <ng-template #templateMultiClasesServicio>
+                            <ul class="collapsed_list text-right m-0 pl-0 pr-4">
+                              <li
+                                *ngFor="
+                                  let claseServicio of regla.CLASE_SERVICIO
+                                "
+                                class="right_to_left"
+                              >
+                                {{ claseServicio }}
+                              </li>
+                            </ul>
+                          </ng-template>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <strong class="card-text">Horario </strong>
+                        <span class="card-text">
+                          {{ regla.TIPO_HORARIO }}
+                        </span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <strong class="card-text"> Hora </strong>
+                        <span class="card-text">
+                          {{ regla.HORA_INICIO + " - " + regla.HORA_FIN }}
+                        </span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <strong class="card-text"> Días </strong>
+                        <div class="card-text w-100">
+                          <ul class="collapsed_list text-right m-0 pl-0 pr-4">
+                            <li
+                              *ngFor="let dia of regla.TIPO_DIA"
+                              class="right_to_left"
+                            >
+                              {{ dia }}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <strong class="card-text"> Municipios </strong>
+                        <div class="card-text">
+                          <ul class="collapsed_list text-right m-0 pl-0 pr-4">
+                            <li
+                              *ngFor="let municipio of regla.MUNICIPIO"
+                              class="right_to_left"
+                            >
+                              {{ municipio | titlecase }}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <strong class="card-text"> Minutos </strong>
+                        <span class="card-text">
+                          {{ regla.MINUTOS }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+            <div class="mb-3">
+              <button
+                type="button"
+                class="btn-success"
+                mat-button
+                popoverClass="reglas_popover shadow"
+                [ngbPopover]="contenidoPopover"
+                [popoverTitle]="tituloPopover"
+                [autoClose]="'outside'"
+                [placement]="ubicacionPopover"
+                #pop="ngbPopover"
+                container="body"
+              >
+                Ver reglas
+              </button>
+            </div>
+            <ng-container
+              *ngIf="
+                mensajesPorReglaTieneDatos;
+                else templateMensajesReglaSinDatos
+              "
+            >
+              <div class="d-flex justify-content-around">
+                <div>
+                  <p>
+                    Apertura
+                    <i
+                      class="fas fa-info-circle"
+                      data-toggle="tooltip"
+                      title="Primeras cinco reglas por las cuales se han difundido mensajes"
+                    ></i>
+                  </p>
+                </div>
+                <div>
+                  <p>
+                    Cierre
+                    <i
+                      class="fas fa-info-circle"
+                      data-toggle="tooltip"
+                      title="Primeras cinco reglas por las cuales se han difundido mensajes"
+                    ></i>
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas
+                  baseChart
+                  class="chart"
+                  [datasets]="barChartData"
+                  [labels]="barChartLabels"
+                  [options]="barChartOptions"
+                  [legend]="barChartLegend"
+                  [chartType]="barChartType"
+                ></canvas>
+              </div>
+            </ng-container>
+            <ng-template #templateMensajesReglaSinDatos>
+              <alerta-sin-resultados></alerta-sin-resultados>
+            </ng-template>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12">
+      <table
+        class="table table-responsive-sm table-striped table-outline shadow sort_white_arrow"
+        id="tablaDinp"
+        matSort
+        matSortActive="municipioNum"
+        matSortDirection="desc"
+        (matSortChange)="sortTablaMunicipios($event)"
+      >
+        <thead class="bg_chec_oscuro rounded-top">
+          <tr>
+            <th class="border-0 float-right px-3 pb-0">
+              <button type="button" class="btn p-0" (click)="dinp('tablaDinp')">
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </th>
+          </tr>
+          <tr>
+            <th mat-sort-header="municipio" class="border-top-0">Municipio</th>
+            <th mat-sort-header="municipioNum" class="text-center border-top-0">
+              Mensajes
+            </th>
+            <th mat-sort-header="porUrbano" class="border-top-0">
+              % Urbano
+              <i
+                class="fas fa-info-circle ml-1"
+                data-toggle="tooltip"
+                title="Porcentaje de mensajes enviados con respecto al total general de mensajes enviados por ubicación Urbano"
+              ></i>
+            </th>
+            <th mat-sort-header="porcRural" class="border-top-0">
+              % Rural
+              <i
+                class="fas fa-info-circle ml-1"
+                data-toggle="tooltip"
+                title="Porcentaje de mensajes enviados con respecto al total general de mensajes enviados por ubicación Rural"
+              ></i>
+            </th>
+            <th mat-sort-header="porMunicipio" class="border-top-0">
+              % Mensajes
+              <i
+                class="fas fa-info-circle ml-1"
+                data-toggle="tooltip"
+                title="Porcentaje de mensajes enviados con respecto al total general de mensajes difundidos"
+              ></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white" id="tbody">
+          <div
+            *ngIf="isLoadingMunicipio; else templateTablaMensajes"
+            class="d-flex justify-content-center py-4"
+          >
+            <span class="spinner-border blue_spinner"></span>
+          </div>
+          <ng-template #templateTablaMensajes>
+            <ng-container
+              *ngIf="
+                datosOrdenadosTablaMunicipio.length;
+                else templateTablaSinDatos
+              "
+            >
+              <tr *ngFor="let datos of datosOrdenadosTablaMunicipio">
+                <td>
+                  <div>{{ datos.municipio | titlecase }}</div>
+                </td>
+                <td>
+                  <strong>{{ datos.municipioNum | number: "":"es-CO" }}</strong>
+                </td>
+                <td>
+                  <div class="clearfix">
+                    <div class="float-left">
+                      <strong>{{ datos.porUrbano }}%</strong>
+                    </div>
+                  </div>
+                  <div class="progress progress-xs bg-secondary">
+                    <div
+                      class="progress-bar bg-primary"
+                      role="progressbar"
+                      [style.width.%]="datos.porUrbano"
+                      [attr.aria-valuenow]="datos.porUrbano"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="clearfix">
+                    <div class="float-left">
+                      <strong>{{ datos.porcRural }}%</strong>
+                    </div>
+                  </div>
+                  <div class="progress progress-xs bg-secondary">
+                    <div
+                      class="progress-bar bg-primary"
+                      role="progressbar"
+                      [style.width.%]="datos.porcRural"
+                      [attr.aria-valuenow]="datos.porcRural"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="clearfix">
+                    <div class="float-left">
+                      <strong>{{ datos.porMunicipio }}%</strong>
+                    </div>
+                  </div>
+                  <div class="progress progress-xs bg-secondary">
+                    <div
+                      class="progress-bar bg-success"
+                      role="progressbar"
+                      [style.width.%]="datos.porMunicipio"
+                      [attr.aria-valuenow]="datos.porMunicipio"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+            <ng-template #templateTablaSinDatos>
+              <div class="p-3">
+                <alerta-sin-resultados></alerta-sin-resultados>
+              </div>
+            </ng-template>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!--
+      <div class="animated fadeIn">
+        <div class="card shadow">
+          <div class="card-header">
+            <span *ngIf="isLoadingDiasSemana" class="spinner-border spinner-border-sm blue_spinner ml-1"></span>
+            <h5>Cantidad de Mensajes Enviados por Hora y Día <i class="fas fa-info-circle" data-toggle="tooltip"
+                title="Cantidad de mensajes enviados por el Sistema de Difusión por hora y día"></i></h5>
+          </div>
+          <div class="card-body">
+            <div class="mid-graph" id="consultasHoraDia"></div>
+          </div>
+        </div>
+      </div>
+    -->
+
+  <div class="row animated fadeIn">
+    <div class="col-md-6">
+      <div class="card shadow" id="segmentos">
+        <!--
+            <div class="card-header">
+              <i (click)="dinp('segmentos')" class="icon-cloud-download d-flex justify-content-end iconDescargas"></i>
+              Consultas por segmentos
+            </div>
+          -->
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Mensajes enviados según Segmento</h5>
+            </div>
+            <div>
+              <button type="button" class="btn p-0" (click)="dinp('segmentos')">
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div
+            *ngIf="isLoadingSegmentos; else templateMsjSegmentos"
+            class="d-flex justify-content-center"
+          >
+            <span class="spinner-border blue_spinner"></span>
+          </div>
+          <ng-template #templateMsjSegmentos>
+            <ng-container
+              *ngIf="
+                mensajesPorSegmentoTieneDatos;
+                else templateMensajesSegmentoSinDatos
+              "
+            >
+              <div class="chart-wrapper">
+                <canvas
+                  baseChart
+                  class="chart"
+                  [colors]="doughnutChartColours"
+                  [data]="doughnutChartData"
+                  [options]="doughnutChartOptions"
+                  [labels]="doughnutChartLabels"
+                  [chartType]="doughnutChartType"
+                ></canvas>
+              </div>
+            </ng-container>
+            <ng-template #templateMensajesSegmentoSinDatos>
+              <alerta-sin-resultados></alerta-sin-resultados>
+            </ng-template>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow" id="ubicacion">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Mensajes enviados según Ubicación</h5>
+            </div>
+            <div>
+              <button type="button" class="btn p-0" (click)="dinp('ubicacion')">
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div
+            *ngIf="isLoadingUbicacion; else templateMsjUbicacion"
+            class="d-flex justify-content-center"
+          >
+            <span class="spinner-border blue_spinner"></span>
+          </div>
+          <ng-template #templateMsjUbicacion>
+            <ng-container
+              *ngIf="
+                mensajesPorUbicacionTieneDatos;
+                else templateMensajesUbicacionSinDatos
+              "
+            >
+              <div class="chart-wrapper">
+                <canvas
+                  baseChart
+                  class="chart"
+                  [colors]="doughnutChartColours2"
+                  [data]="doughnutChartData2"
+                  [options]="doughnutChartOptions"
+                  [labels]="doughnutChartLabels2"
+                  [chartType]="doughnutChartType2"
+                ></canvas>
+              </div>
+            </ng-container>
+            <ng-template #templateMensajesUbicacionSinDatos>
+              <alerta-sin-resultados></alerta-sin-resultados>
+            </ng-template>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

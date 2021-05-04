@@ -1,0 +1,191 @@
+<div class="row justify-content-center">
+  <div class="shadow mx-5 mt-4 mb-5">
+    <div
+      class="d-flex justify-content-between align-items-center bg_chec_oscuro py-2 px-3"
+    >
+      <h5 class="m-0">Mensajes</h5>
+      <div class="d-flex align-items-center">
+        <div class="mr-3">
+          <input
+            class="form-control"
+            placeholder="Buscar"
+            (input)="
+              ServiceProvider.aplicarFiltroTabla(
+                $event,
+                dataSourceStepConfirmacion
+              )
+            "
+            #inputFiltro
+          />
+        </div>
+        <div class="btn-group" dropdown placement="bottom right">
+          <button
+            mat-icon-button
+            ngbTooltip="Descargar mensajes"
+            container="body"
+            dropdownToggle
+            class="hover_white outline_none"
+          >
+            <mat-icon>get_app</mat-icon>
+          </button>
+          <ul
+            *dropdownMenu
+            class="dropdown-menu dropdown-menu-right"
+            role="menu"
+          >
+            <li role="menuitem">
+              <button
+                class="dropdown-item"
+                (click)="descargarMensajes('todos')"
+              >
+                Todos los mensajes
+              </button>
+            </li>
+            <li *ngIf="isSuperiorMaxCaracteres" role="menuitem">
+              <button
+                class="dropdown-item"
+                (click)="descargarMensajes('superiores')"
+              >
+                Superiores a 160 caracteres
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <table
+      class=""
+      mat-table
+      [dataSource]="dataSourceStepConfirmacion"
+      multiTemplateDataRows
+      matSort
+      matSortActive="cantidadCaracteres"
+      matSortDirection="desc"
+    >
+      <ng-container matColumnDef="celular">
+        <th class="px-4" mat-header-cell mat-sort-header *matHeaderCellDef>
+          Celular
+        </th>
+        <td class="px-4" mat-cell *matCellDef="let datosMensaje">
+          {{ datosMensaje.celular }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="mensaje">
+        <th class="px-4" mat-header-cell mat-sort-header *matHeaderCellDef>
+          Mensaje
+        </th>
+        <td
+          class="px-4"
+          mat-cell
+          *matCellDef="let datosMensaje"
+          [ngbTooltip]="datosMensaje.mensaje"
+          container="body"
+        >
+          <span class="d-block text-truncate">
+            {{ datosMensaje.mensaje }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cantidadCaracteres">
+        <th class="px-4" mat-header-cell mat-sort-header *matHeaderCellDef>
+          Cantidad de caracteres &nbsp;
+          <span
+            [ngbTooltip]="MESSAGES.ayudaCantidadCaracteres"
+            container="body"
+          >
+            <i class="fas fa-question-circle fa-lg"></i>
+          </span>
+        </th>
+        <td class="text-center px-4" mat-cell *matCellDef="let datosMensaje">
+          {{ datosMensaje.cantidadCaracteres }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cantidadMensajes">
+        <th class="px-4" mat-header-cell mat-sort-header *matHeaderCellDef>
+          Cantidad de mensajes &nbsp;
+          <span [ngbTooltip]="MESSAGES.ayudaCantidadMensajes" container="body">
+            <i class="fas fa-question-circle fa-lg"></i>
+          </span>
+        </th>
+        <td class="text-center px-4" mat-cell *matCellDef="let datosMensaje">
+          {{ datosMensaje.cantidadMensajes }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="accion">
+        <th class="text-center px-4" mat-header-cell *matHeaderCellDef>
+          Acción
+        </th>
+        <td class="text-center px-4" mat-cell *matCellDef="let datosMensaje">
+          <a
+            class="bg_ghostwhite"
+            mat-stroked-button
+            ngbTooltip="Editar mensaje"
+            container="body"
+            (click)="
+              openDialog('Editar', datosMensaje); $event.stopPropagation()
+            "
+          >
+            <i class="fas fa-pen"></i>
+          </a>
+        </td>
+      </ng-container>
+
+      <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+      <ng-container matColumnDef="expandedDetail">
+        <td
+          mat-cell
+          *matCellDef="let element"
+          [attr.colspan]="columnsStepConfirmacion.length"
+        >
+          <div
+            class="mat_element_detail"
+            [@detailExpand]="
+              element == expandedElement ? 'expanded' : 'collapsed'
+            "
+          >
+            <div class="d-flex align-items-center font_weight_500">
+              Mensaje
+            </div>
+            <div class="mat_element_description text-break">
+              {{ element.mensaje }}
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsStepConfirmacion"></tr>
+
+      <tr
+        mat-row
+        *matRowDef="let row; columns: columnsStepConfirmacion"
+        class="mat_element_row cursor_pointer"
+        [class.alert-warning]="row.cantidadCaracteres > maxCaracteresMensaje"
+        [class.mat_expanded_row]="expandedElement === row"
+        (click)="expandedElement = expandedElement === row ? null : row"
+      ></tr>
+
+      <tr
+        mat-row
+        *matRowDef="let row; columns: ['expandedDetail']"
+        class="mat_detail_row"
+      ></tr>
+
+      <!-- Fila que se muestra si el filtro de búsqueda no arroja resultados (Solo para Angular Versión 10) -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" [attr.colspan]="columnsStepConfirmacion.length">
+          No existen datos para el término "{{ inputFiltro.value }}"
+        </td>
+      </tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+</div>

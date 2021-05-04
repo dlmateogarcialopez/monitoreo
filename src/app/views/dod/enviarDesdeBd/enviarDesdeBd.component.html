@@ -1,0 +1,1547 @@
+<div class="container">
+  <mat-horizontal-stepper [linear]="isLinear" #stepper selectedIndex="0" class="shadow">
+    <!-- Muestra números en cada step en lugar del ícono "edit" -->
+    <ng-template matStepperIcon="edit" let-index="index">
+      {{ index + 1 }}
+    </ng-template>
+
+    <!-- Paso 1 -->
+    <mat-step [stepControl]="formDestinatarios">
+      <form [formGroup]="formDestinatarios" class="mt-3">
+        <ng-template matStepLabel>Destinatarios</ng-template>
+
+        <div class="form-group row align-items-baseline">
+          <label class="col-md-3 col-form-label">Destinatarios</label>
+          <div
+            class="text-center {{
+              radioFiltro.value === 'numeroCuenta' ? 'col-md-7' : 'col-md-4'
+            }}"
+          >
+            <a
+              mat-mini-fab
+              ngbTooltip="Agregar destinatarios"
+              container="body"
+              data-toggle="modal"
+              (click)="modalAgregarCamposDestinatarios.show()"
+              class="boton_redondo boton_chec"
+            >
+              <i class="fas fa-plus"></i>
+            </a>
+          </div>
+        </div>
+        <ng-container
+          *ngIf="
+            formDestinatariosFields.radioFiltro.value === 'numeroCuenta';
+            else templateOtrosCampos
+          "
+        >
+          <div class="form-group row">
+            <label
+              for="textAreaNumeroCuenta"
+              class="col-md-3 col-form-label pt-0"
+            >
+              Número de cuenta
+            </label>
+
+            <div class="col-md-7">
+              <textarea
+                formControlName="textAreaNumeroCuenta"
+                class="form-control"
+                id="textAreaNumeroCuenta"
+                name="textAreaNumeroCuenta"
+                rows="3"
+                placeholder="Escribe los números de cuenta separados por coma"
+                (input)="countCantidadCuentas($event)"
+              ></textarea>
+
+              <div
+                *ngIf="
+                  formDestinatariosFields.textAreaNumeroCuenta.invalid &&
+                  (formDestinatariosFields.textAreaNumeroCuenta.dirty ||
+                    formDestinatariosFields.textAreaNumeroCuenta.touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span
+                  *ngIf="
+                    formDestinatariosFields.textAreaNumeroCuenta.errors.required
+                  "
+                >
+                  {{ MESSAGES.requerido }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #templateOtrosCampos>
+          <ng-container formGroupName="formGroupFiltros">
+            <div class="form-group row align-items-baseline">
+              <label for="selectSegmento" class="col-md-3 col-form-label"
+                >Segmento</label
+              >
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectSegmento"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectSegmento"
+                    [matAutocomplete]="autoSegmento"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoSegmento="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="
+                      countUsuariosFiltro($event, 'selectSegmento')
+                    "
+                  >
+                    <!-- disableRipple="true" -->
+                    <mat-option
+                      *ngFor="let segmento of filteredSegmento | async"
+                      [value]="segmento"
+                    >
+                      {{ segmento }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectSegmento.invalid &&
+                    (formGroupFiltrosFields.selectSegmento.dirty ||
+                      formGroupFiltrosFields.selectSegmento.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="
+                      formGroupFiltrosFields.selectSegmento.errors.required
+                    "
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="isCheckboxSubsegmentoChecked"
+              class="form-group row align-items-baseline"
+            >
+              <label for="selectSubsegmento" class="col-md-3 col-form-label">
+                Subsegmento
+              </label>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectSubsegmento"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectSubsegmento"
+                    [matAutocomplete]="autoSubsegmento"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoSubsegmento="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="
+                      countUsuariosFiltro($event, 'selectSubsegmento')
+                    "
+                  >
+                    <mat-option
+                      *ngFor="let option of filteredSubsegmento | async"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectSubsegmento.invalid &&
+                    (formGroupFiltrosFields.selectSubsegmento.dirty ||
+                      formGroupFiltrosFields.selectSubsegmento.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="
+                      formGroupFiltrosFields.selectSubsegmento.errors.required
+                    "
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="isCheckboxClaseServicioChecked"
+              class="form-group row align-items-baseline"
+            >
+              <label for="selectClaseServicio" class="col-md-3 col-form-label">
+                Clase de servicio
+              </label>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectClaseServicio"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectClaseServicio"
+                    [matAutocomplete]="autoClaseServicio"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoClaseServicio="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="
+                      countUsuariosFiltro($event, 'selectClaseServicio')
+                    "
+                  >
+                    <mat-option
+                      *ngFor="let option of filteredClaseServicio | async"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectClaseServicio.invalid &&
+                    (formGroupFiltrosFields.selectClaseServicio.dirty ||
+                      formGroupFiltrosFields.selectClaseServicio.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="
+                      formGroupFiltrosFields.selectClaseServicio.errors.required
+                    "
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="isCheckboxUbicacionChecked"
+              class="form-group row align-items-baseline"
+            >
+              <label for="selectUbicacion" class="col-md-3 col-form-label">
+                Ubicación
+              </label>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectUbicacion"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectUbicacion"
+                    [matAutocomplete]="autoUbicacion"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoUbicacion="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="
+                      countUsuariosFiltro($event, 'selectUbicacion')
+                    "
+                  >
+                    <mat-option
+                      *ngFor="let option of filteredUbicacion | async"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectUbicacion.invalid &&
+                    (formGroupFiltrosFields.selectUbicacion.dirty ||
+                      formGroupFiltrosFields.selectUbicacion.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="
+                      formGroupFiltrosFields.selectUbicacion.errors.required
+                    "
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="isCheckboxCircuitoChecked"
+              class="form-group row align-items-baseline"
+            >
+              <label for="selectCircuito" class="col-md-3 col-form-label">
+                Circuito
+              </label>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectCircuito"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectCircuito"
+                    [matAutocomplete]="autoCircuito"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoCircuito="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="
+                      countUsuariosFiltro($event, 'selectCircuito')
+                    "
+                  >
+                    <mat-option
+                      *ngFor="let option of filteredCircuito | async"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectCircuito.invalid &&
+                    (formGroupFiltrosFields.selectCircuito.dirty ||
+                      formGroupFiltrosFields.selectCircuito.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="
+                      formGroupFiltrosFields.selectCircuito.errors.required
+                    "
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="isCheckboxNodoChecked"
+              class="form-group row align-items-baseline"
+            >
+              <label for="selectNodo" class="col-md-3 col-form-label">
+                Nodo
+              </label>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectNodo"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectNodo"
+                    [matAutocomplete]="autoNodo"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoNodo="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="countUsuariosFiltro($event, 'selectNodo')"
+                  >
+                    <mat-option
+                      *ngFor="let option of filteredNodo | async"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectNodo.invalid &&
+                    (formGroupFiltrosFields.selectNodo.dirty ||
+                      formGroupFiltrosFields.selectNodo.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="formGroupFiltrosFields.selectNodo.errors.required"
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="isCheckboxMunicipioChecked"
+              class="form-group row align-items-baseline"
+            >
+              <label for="selectMunicipio" class="col-md-3 col-form-label">
+                Municipio
+              </label>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectMunicipio"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectMunicipio"
+                    [matAutocomplete]="autoMunicipio"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoMunicipio="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="
+                      countUsuariosFiltro($event, 'selectMunicipio')
+                    "
+                  >
+                    <mat-option
+                      *ngFor="let option of filteredMunicipio | async"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectMunicipio.invalid &&
+                    (formGroupFiltrosFields.selectMunicipio.dirty ||
+                      formGroupFiltrosFields.selectMunicipio.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="
+                      formGroupFiltrosFields.selectMunicipio.errors.required
+                    "
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="isCheckboxEstratoChecked"
+              class="form-group row align-items-baseline"
+            >
+              <label for="selectEstrato" class="col-md-3 col-form-label">
+                Estrato
+              </label>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100 cursor_pointer" floatLabel="never">
+                  <input
+                    type="text"
+                    class="cursor_pointer input_focus"
+                    id="selectEstrato"
+                    placeholder="Selecciona"
+                    matInput
+                    formControlName="selectEstrato"
+                    [matAutocomplete]="autoEstrato"
+                  />
+                  <span class="cursor_pointer" matSuffix>
+                    <i class="fas fa-caret-down"></i>
+                  </span>
+                  <mat-autocomplete
+                    #autoEstrato="matAutocomplete"
+                    autoActiveFirstOption="true"
+                    (optionSelected)="
+                      countUsuariosFiltro($event, 'selectEstrato')
+                    "
+                  >
+                    <mat-option
+                      *ngFor="let option of filteredEstrato | async"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <div
+                  *ngIf="
+                    formGroupFiltrosFields.selectEstrato.invalid &&
+                    (formGroupFiltrosFields.selectEstrato.dirty ||
+                      formGroupFiltrosFields.selectEstrato.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="formGroupFiltrosFields.selectEstrato.errors.required"
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <div class="form-group row">
+            <label for="porcentajeUsuarios" class="col-md-3 col-form-label pt-0"
+              >Porcentaje de usuarios</label
+            >
+            <div class="col-md-4">
+              <div class="input-group">
+                <input
+                  type="number"
+                  formControlName="porcentajeUsuarios"
+                  #porcentajeUsuarios
+                  name="porcentajeUsuarios"
+                  min="1"
+                  max="100"
+                  class="form-control"
+                  id="porcentajeUsuarios"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+
+              <div
+                *ngIf="
+                  formDestinatariosFields.porcentajeUsuarios.invalid &&
+                  (formDestinatariosFields.porcentajeUsuarios.dirty ||
+                    formDestinatariosFields.porcentajeUsuarios.touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span
+                  *ngIf="
+                    formDestinatariosFields.porcentajeUsuarios.errors.required
+                  "
+                >
+                  {{ MESSAGES.requerido }}
+                </span>
+                <span
+                  *ngIf="
+                    formDestinatariosFields.porcentajeUsuarios.errors.min ||
+                    formDestinatariosFields.porcentajeUsuarios.errors.max
+                  "
+                >
+                  Debes escribir un porcentaje válido
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+        <div class="form-group row align-items-baseline font_weight_500">
+          <label class="col-md-3 col-form-label"
+            >Cantidad de usuarios
+            {{
+              radioFiltro.value === "otrosCampos" ? "con celulares válidos" : ""
+            }}
+          </label>
+          <div
+            class="col-form-label {{
+              radioFiltro.value === 'numeroCuenta' ? 'col-md-7' : 'col-md-4'
+            }}"
+          >
+            <span class="bg-success p-1">
+              {{ getTotalUsuarios() | number }}
+            </span>
+            <!-- &nbsp; -->
+            <span
+              *ngIf="isLoading"
+              class="spinner-border spinner-border-sm blue_spinner ml-1"
+            ></span>
+
+            <input
+              type="hidden"
+              formControlName="totalUsuarios"
+              name="hiddenTotalUsuarios"
+            />
+
+            <div
+              *ngIf="
+                formDestinatariosFields.totalUsuarios.invalid &&
+                (formDestinatariosFields.totalUsuarios.dirty ||
+                  formDestinatariosFields.totalUsuarios.touched)
+              "
+              class="text-center m-0 text-danger texto_pequeno"
+            >
+              <span *ngIf="formDestinatariosFields.totalUsuarios.errors.min">
+                La cantidad de usuarios no es válida
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button
+            class="boton_chec"
+            mat-button
+            matStepperNext
+            (click)="validateStep(formDestinatarios)"
+          >
+            Siguiente
+          </button>
+        </div>
+
+        <!---------------------- INICIO MODAL ---------------------------------->
+        <div
+          bsModal
+          #modalAgregarCamposDestinatarios="bs-modal"
+          class="modal fade"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="myModalLabel"
+          aria-hidden="true"
+        >
+          <div
+            class="modal-dialog modal-sm modal-dialog-centered"
+            role="document"
+          >
+            <div class="modal-content">
+              <div class="modal-header px-3">
+                <h5 class="modal-title m-0">Agregar campos</h5>
+                <button
+                  type="button"
+                  class="close"
+                  (click)="modalAgregarCamposDestinatarios.hide()"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <label for="radioFiltroLabel" class="col-12 col-form-label">
+                    Selecciona el filtro que quieres aplicar
+                  </label>
+
+                  <div class="col">
+                    <mat-radio-group
+                      formControlName="radioFiltro"
+                      class="vertical_radio_group"
+                      aria-labelledby="radioFiltroLabel"
+                      (change)="setFiltrosValidators($event)"
+                      #radioFiltro="matRadioGroup"
+                    >
+                      <mat-radio-button
+                        color="primary"
+                        class="radioButton"
+                        value="numeroCuenta"
+                      >
+                        Número de cuenta
+                      </mat-radio-button>
+                      <mat-radio-button
+                        color="primary"
+                        class="radioButton"
+                        value="otrosCampos"
+                      >
+                        Otros campos
+                      </mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+
+                <ng-container
+                  *ngIf="radioFiltro.value === 'otrosCampos'"
+                  formArrayName="otrosCamposDestinatarios"
+                  class="form-horizontal"
+                >
+                  <div
+                    *ngFor="
+                      let campo of dataSourceCamposDestinatarios;
+                      let i = index
+                    "
+                    class="row justify-content-between"
+                  >
+                    <ng-container [formGroupName]="i">
+                      <mat-checkbox
+                        formControlName="checkbox"
+                        class="w-100 checkbox_agregar_destinatarios"
+                        labelPosition="before"
+                        color="primary"
+                        (change)="checkCamposDestinatarios2($event, campo)"
+                      >
+                        <span>
+                          {{ campo.nombreCampo }}
+                        </span>
+                      </mat-checkbox>
+                    </ng-container>
+                  </div>
+                </ng-container>
+              </div>
+              <div class="modal-footer border-top-0 pt-0">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  (click)="modalAgregarCamposDestinatarios.hide()"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---------------------- FIN MODAL ---------------------------------->
+      </form>
+    </mat-step>
+
+    <!-- Paso 2 -->
+    <mat-step [stepControl]="formTipoMensaje">
+      <form [formGroup]="formTipoMensaje" class="mt-3">
+        <ng-template matStepLabel>Tipo de mensaje</ng-template>
+        <div class="form-group row">
+          <label for="motivoEnvio" class="col-md-3 col-form-label pt-0"
+            >Motivo del envío</label
+          >
+          <div class="col-md-7">
+            <textarea
+              formControlName="textAreaMotivo"
+              class="form-control"
+              id="motivoEnvio"
+              name="motivoEnvio"
+              rows="3"
+            ></textarea>
+
+            <div
+              *ngIf="
+                formTipoMensajeFields.textAreaMotivo.invalid &&
+                (formTipoMensajeFields.textAreaMotivo.dirty ||
+                  formTipoMensajeFields.textAreaMotivo.touched)
+              "
+              class="text-center m-0 text-danger texto_pequeno"
+            >
+              <span
+                *ngIf="formTipoMensajeFields.textAreaMotivo.errors.required"
+              >
+                {{ MESSAGES.requerido }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" id="tipoMensajeLabel"
+            >Tipo de mensaje a enviar</label
+          >
+          <div class="col-md-7">
+            <mat-radio-group
+              formControlName="radioTipoMensaje"
+              class="vertical_radio_group"
+              aria-labelledby="tipoMensajeLabel"
+            >
+              <mat-radio-button
+                *ngFor="let tipo of tiposMensaje"
+                color="primary"
+                class="radioButton"
+                [value]="tipo"
+              >
+                Mensaje {{ tipo }}
+              </mat-radio-button>
+            </mat-radio-group>
+
+            <div
+              *ngIf="
+                formTipoMensajeFields.radioTipoMensaje.invalid &&
+                (formTipoMensajeFields.radioTipoMensaje.dirty ||
+                  formTipoMensajeFields.radioTipoMensaje.touched)
+              "
+              class="text-center m-0 text-danger texto_pequeno"
+            >
+              <span
+                *ngIf="formTipoMensajeFields.radioTipoMensaje.errors.required"
+              >
+                {{ MESSAGES.requerido }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="usuarioHasEnvioPrioritario"
+          class="form-group row align-items-baseline"
+        >
+          <label class="col-md-3 col-form-label">Envío prioritario</label>
+          <div class="col-md-7">
+            <mat-checkbox
+              formControlName="envioPrioritario"
+              color="primary"
+            ></mat-checkbox>
+            <span
+              class="col-md-2 cursor_pointer"
+              [ngbTooltip]="MESSAGES.ayudaEnvioPrioritario"
+              container="body"
+            >
+              <i class="fas fa-question-circle fa-md"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button class="boton_chec mr-1" mat-button matStepperPrevious>
+            Anterior
+          </button>
+          <button
+            class="boton_chec"
+            mat-button
+            matStepperNext
+            (click)="validateStep(formTipoMensaje)"
+          >
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Paso 3 -->
+    <mat-step [stepControl]="formMensaje">
+      <form [formGroup]="formMensaje" class="mt-3">
+        <ng-template matStepLabel>Mensaje</ng-template>
+        <!-- Si el mensaje es "individual" -->
+        <ng-container
+          *ngIf="
+            formTipoMensajeFields.radioTipoMensaje.value === tiposMensaje[1]
+          "
+        >
+          <!-- <label class="border-bottom font_weight_500 mb-3">
+            Selecciona los campos para escribir el mensaje
+          </label> -->
+
+          <div class="row mb-4">
+            <div class="col-md-4 col-sm-6">
+              <div class="mat-elevation-z8 mx-5 mb-3">
+                <div
+                  class="d-flex justify-content-between align-items-center bg-white py-2 px-3"
+                >
+                  <div class="">
+                    <h5 class="m-0">Datos de usuario</h5>
+                  </div>
+                </div>
+
+                <table class="">
+                  <tbody>
+                    <ng-container *ngFor="let marcador of arrayAyudaMarcadores">
+                      <tr
+                        *ngIf="marcador.categoria === 'usuario'"
+                        class="fila mat-row border-bottom"
+                      >
+                        <!-- <td class="mat-cell">{{ marcador.nombre }}</td> -->
+                        <td class="row align-items-center py-3">
+                          <i
+                            class="col-4 fas fa-{{
+                              marcador.icono
+                            }} fa-fw text-right"
+                          ></i>
+                          <span class="col-8 pl-0 text-break"
+                            >@{{ marcador.marcador }}</span
+                          >
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+              <div class="mat-elevation-z8 mx-5 mb-3">
+                <div
+                  class="d-flex justify-content-between align-items-center bg-white py-2 px-3"
+                >
+                  <div class="">
+                    <h5 class="m-0">Datos de ubicación</h5>
+                  </div>
+                </div>
+                <table class="">
+                  <!-- <thead>
+                  <tr class="mat-header-row">
+                    <th class="mat-header-cell">
+                    Módulos
+                    </th>
+                  </tr>
+                </thead> -->
+                  <tbody>
+                    <ng-container *ngFor="let marcador of arrayAyudaMarcadores">
+                      <tr
+                        *ngIf="marcador.categoria === 'ubicacion'"
+                        class="fila mat-row border-bottom"
+                      >
+                        <!-- <td class="mat-cell">{{ marcador.nombre }}</td> -->
+                        <td class="row align-items-center py-3">
+                          <i
+                            class="col-4 fas fa-{{
+                              marcador.icono
+                            }} fa-fw text-right"
+                          ></i>
+                          <span class="col-8 pl-0 text-break"
+                            >@{{ marcador.marcador }}</span
+                          >
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+              <div class="mat-elevation-z8 mx-5 mb-3">
+                <div
+                  class="d-flex justify-content-between align-items-center bg-white py-2 px-3"
+                >
+                  <div class="">
+                    <h5 class="m-0">Otros datos</h5>
+                  </div>
+                </div>
+
+                <table class="">
+                  <!-- <thead>
+                  <tr class="mat-header-row">
+                    <th class="mat-header-cell">
+                    Módulos
+                    </th>
+                  </tr>
+                </thead> -->
+                  <tbody>
+                    <ng-container *ngFor="let marcador of arrayAyudaMarcadores">
+                      <tr
+                        *ngIf="marcador.categoria === 'otros'"
+                        class="fila mat-row border-bottom"
+                      >
+                        <td class="row align-items-center py-3">
+                          <i
+                            class="col-4 fas fa-{{
+                              marcador.icono
+                            }} fa-fw text-right"
+                          ></i>
+                          <span class="col-8 pl-0 text-break"
+                            >@{{ marcador.marcador }}</span
+                          >
+                        </td>
+                        <!-- <td class="mat-cell">{{ marcador.nombre }}</td> -->
+                        <!-- <td class="mat-cell px-5">
+                          <i class="fas fa-{{ marcador.icono }} fa-fw mr-3"></i>
+                          <span>@{{ marcador.marcador }}</span>
+                        </td> -->
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="row justify-content-center mb-4">
+            <div class="col-lg-4 col-md-5 col-sm-7">
+              <mat-accordion>
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      Marcadores
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <ng-container
+                    *ngFor="let marcador of arrayAyudaMarcadores; let i = index"
+                  >
+                    <div class="row">
+                      <div class="col-md-6 col-sm-12 font_weight_500">
+                        {{ marcador.nombre }}
+                      </div>
+                      <div class="col-md-6 col-sm-12">
+                        @{{ marcador.marcador }}
+                      </div>
+                    </div>
+                    <hr *ngIf="arrayAyudaMarcadores.length - 1 !== i" />
+                  </ng-container>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
+          </div> -->
+        </ng-container>
+
+        <!-- Este elemento se muestra tanto para mensaje general como para individual  -->
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label m-0 pt-0" for="mensaje"
+            >Mensaje {{ formTipoMensajeFields.radioTipoMensaje.value }}</label
+          >
+          <div class="col-md-7">
+            <!-- Si el mensaje seleccionado es individual, agregar en el textarea de Mensaje las propiedades [mention] y [mentionConfig]; sino, quitar estas propiedades -->
+            <ng-container
+              *ngIf="
+                formTipoMensajeFields.radioTipoMensaje.value ===
+                  tiposMensaje[1];
+                else templateTextAreaMensajeGeneral
+              "
+            >
+              <textarea
+                formControlName="textAreaMensaje"
+                [mention]="arrayMarcadores"
+                [mentionConfig]="marcadoresConfig"
+                (opened)="ServiceProvider.showContainerOverflow()"
+                (closed)="ServiceProvider.hideContainerOverflow()"
+                (input)="showVistaPrevia($event)"
+                class="form-control"
+                id="mensaje"
+                name="mensaje"
+                rows="3"
+              ></textarea>
+            </ng-container>
+
+            <ng-template #templateTextAreaMensajeGeneral>
+              <textarea
+                formControlName="textAreaMensaje"
+                class="form-control"
+                id="mensaje"
+                name="mensaje"
+                rows="3"
+              ></textarea>
+            </ng-template>
+
+            <span
+              class="{{
+                formMensajeFields.textAreaMensaje.value?.length <=
+                maxCaracteresMensaje
+                  ? 'text-muted'
+                  : 'text-danger'
+              }}"
+            >
+              Caracteres restantes:
+              {{
+                maxCaracteresMensaje -
+                  formMensajeFields.textAreaMensaje.value?.length
+              }}
+            </span>
+            <!-- Mostrar esta ayuda solo cuando el mensaje es individual -->
+            <span
+              *ngIf="
+                formTipoMensajeFields.radioTipoMensaje.value === tiposMensaje[1]
+              "
+              class="cursor_pointer"
+              [ngbTooltip]="MESSAGES.ayudaCaracteresRestantes"
+              container="body"
+            >
+              <i class="fas fa-question-circle fa-md"></i>
+            </span>
+
+            <div
+              *ngIf="
+                formMensajeFields.textAreaMensaje.invalid &&
+                (formMensajeFields.textAreaMensaje.dirty ||
+                  formMensajeFields.textAreaMensaje.touched)
+              "
+              class="text-center m-0 text-danger texto_pequeno"
+            >
+              <span *ngIf="formMensajeFields.textAreaMensaje.errors.required">
+                {{ MESSAGES.requerido }}
+              </span>
+            </div>
+
+            <div
+              *ngIf="
+                formTipoMensajeFields.radioTipoMensaje.value ===
+                  tiposMensaje[1] && formMensajeFields.textAreaMensaje.value
+              "
+              class="font-italic texto_pequeno mt-3"
+            >
+              <span class="font_weight_500">Vista previa:</span>
+              {{ mensajeVistaPrevia }}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button class="boton_chec mr-1" mat-button matStepperPrevious>
+            Anterior
+          </button>
+          <button
+            class="boton_chec"
+            mat-button
+            matStepperNext
+            (click)="handleFormMensaje(formMensaje)"
+          >
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Paso 4 -->
+    <mat-step [stepControl]="formConfirmacion">
+      <form [formGroup]="formConfirmacion" class="mt-3">
+        <ng-template matStepLabel>Confirmación</ng-template>
+
+        <!-- <div class="row justify-content-center mx-3">
+          <div class="col-sm-7 col-md-3 mb-4">
+            <div class="d-flex bd-highlight border align-items-center">
+              <div class="px-3 py-4 bg-success bd-highlight">
+                <i class="fa fa-fw fa-envelope bg-success font-2xl"></i>
+              </div>
+
+              <div class="px-3">
+                <div class="h5 text-info mb-0">
+                  12312
+                </div>
+                <div class="text-muted text-uppercase font-weight-bold font-xs">
+                  MENSAJES A ENVIAR
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-7 col-md-3 mb-4">
+            <div class="d-flex bd-highlight border align-items-center">
+              <div class="px-3 py-4 bg-success bd-highlight">
+                <i class="fa fa-fw fa-dollar-sign bg-success font-2xl"></i>
+              </div>
+
+              <div class="px-3">
+                <div class="h5 text-info mb-0">
+                  12312
+                </div>
+                <div class="text-muted text-uppercase font-weight-bold font-xs">
+                  MENSAJES A ENVIAR
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-7 col-md-3 mb-4">
+            <div class="d-flex bd-highlight border align-items-center">
+              <div class="px-3 py-4 bg-success bd-highlight">
+                <i class="fa fa-fw fa-phone bg-success font-2xl"></i>
+              </div>
+
+              <div class="px-3">
+                <div class="h5 text-info mb-0">
+                  12312
+                </div>
+                <div class="text-muted text-uppercase font-weight-bold font-xs">
+                  MENSAJES A ENVIAR
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+        <!-- <ng-container *ngIf="arrayCelularesExcluidos.length">
+          <div class="row align-items-center">
+            <div
+              class="col-md-auto col-lg-auto alert alert-danger mx-5"
+              role="alert"
+            >
+              <span class="mr-2">
+                <i class="fas fa-exclamation-circle fa-lg"></i>
+              </span>
+              <span>
+                {{ arrayCelularesExcluidos.length }}
+                {{
+                  arrayCelularesExcluidos.length === 1
+                    ? "celular excede"
+                    : "celulares exceden"
+                }}
+                la cuota de envío a clientes.
+              </span>
+              <span class="link" (click)="modalCelularesExcluidos.show()"
+                >Ver celulares
+              </span>
+            </div>
+          </div>
+
+          <div
+            bsModal
+            #modalCelularesExcluidos="bs-modal"
+            class="modal fade"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="myModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header px-3">
+                  <h5 class="modal-title m-0">Celulares excluidos</h5>
+                  <button
+                    type="button"
+                    class="close"
+                    (click)="modalCelularesExcluidos.hide()"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>{{ MESSAGES.ayudaMensajesCuotaCliente }}</p>
+                  <div class="overflow-auto" style="max-height: 30vh;">
+                    <ul class="mb-0">
+                      <li
+                        *ngFor="let celularExcluido of arrayCelularesExcluidos"
+                      >
+                        {{ celularExcluido.celular }}
+                      </li>
+                    </ul>
+                  </div>
+                  <p class="mt-3 mb-0">
+                    Total: {{ arrayCelularesExcluidos.length }}
+                  </p>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="modalCelularesExcluidos.hide()"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container> -->
+
+        <!-- <ng-container *ngIf="isSuperiorMaxCaracteres">
+          <div class="row align-items-center">
+            <div
+              class="col-md-auto col-lg-auto alert alert-warning mx-5"
+              role="alert"
+            >
+              <span class="mr-2">
+                <i class="fas fa-exclamation-triangle fa-lg"></i>
+              </span>
+              <span>
+                {{ countMensajesSuperioresMaxCaracteres }}
+                {{
+                  countMensajesSuperioresMaxCaracteres === 1
+                    ? "mensaje excede"
+                    : "mensajes exceden"
+                }}
+                los 160 caracteres.
+              </span>
+              <span class="link" (click)="isCollapsed = !isCollapsed"
+                >{{ isCollapsed ? "Más" : "Menos" }} información
+              </span>
+            </div>
+
+            <div
+              class="col-md-7 alert alert-light mx-5 mb-0"
+              [collapse]="isCollapsed"
+              [isAnimated]="true"
+              role="alert"
+            >
+              {{ MESSAGES.ayudaMensajesSuperiores }}
+            </div>
+          </div>
+
+          <div class="form-group row ml-3 mb-0">
+            <label
+              class="col-md-auto col-form-label"
+              id="mensajesSuperioresLabel"
+              >¿Deseas enviar también estos mensajes?</label
+            >
+            <div class="col-md-auto">
+              <mat-radio-group
+                formControlName="radioMensajesSuperiores"
+                aria-labelledby="mensajesSuperioresLabel"
+                (change)="setMensajesAEnviar($event)"
+              >
+                <mat-radio-button
+                  color="primary"
+                  class="radioButton"
+                  value="true"
+                >
+                  Sí
+                </mat-radio-button>
+                <mat-radio-button
+                  color="primary"
+                  class="radioButton"
+                  value="false"
+                >
+                  No
+                </mat-radio-button>
+              </mat-radio-group>
+
+              <div
+                *ngIf="
+                  formConfirmacionFields.radioMensajesSuperiores.invalid &&
+                  (formConfirmacionFields.radioMensajesSuperiores.dirty ||
+                    formConfirmacionFields.radioMensajesSuperiores.touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span
+                  *ngIf="
+                    formConfirmacionFields.radioMensajesSuperiores.errors
+                      .required
+                  "
+                >
+                  {{ MESSAGES.requerido }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container> -->
+
+        <!-- <div class="row justify-content-center">
+          <div class="mat-elevation-z8 mx-5 mt-4 mb-5">
+            <div
+              class="d-flex justify-content-between align-items-center bg-white py-2 px-3"
+            >
+              <div class="">
+                <h5 class="m-0">Mensajes</h5>
+              </div>
+            </div>
+
+            <table
+              class="mat-elevation-z8"
+              mat-table
+              [dataSource]="dataSourceStepConfirmacion"
+              multiTemplateDataRows
+              matSort
+              matSortActive="cantidadCaracteres"
+              matSortDirection="desc"
+            >
+              <ng-container matColumnDef="celular">
+                <th
+                  class="px-4"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Celular
+                </th>
+                <td class="px-4" mat-cell *matCellDef="let datosMensaje">
+                  {{ datosMensaje.celular }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="mensaje">
+                <th
+                  class="px-4"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Mensaje
+                </th>
+                <td
+                  class="px-4"
+                  mat-cell
+                  *matCellDef="let datosMensaje"
+                  [ngbTooltip]="datosMensaje.mensaje"
+                  container="body"
+                >
+                  <span class="d-block text-truncate">
+                    {{ datosMensaje.mensaje }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cantidadCaracteres">
+                <th
+                  class="px-4"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Cantidad de caracteres &nbsp;
+                  <span
+                    [ngbTooltip]="MESSAGES.ayudaCantidadCaracteres"
+                    container="body"
+                  >
+                    <i class="fas fa-question-circle fa-lg"></i>
+                  </span>
+                </th>
+                <td
+                  class="text-right px-4"
+                  mat-cell
+                  *matCellDef="let datosMensaje"
+                >
+                  {{ datosMensaje.cantidadCaracteres }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cantidadMensajesPorUsuario">
+                <th
+                  class="pl-3"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Cantidad de mensajes a enviar &nbsp;
+                  <span
+                    [ngbTooltip]="MESSAGES.ayudaCantidadMensajes"
+                    container="body"
+                  >
+                    <i class="fas fa-question-circle fa-lg"></i>
+                  </span>
+                </th>
+                <td
+                  class="text-right px-4"
+                  mat-cell
+                  *matCellDef="let datosMensaje"
+                >
+                  {{ datosMensaje.cantidadMensajes }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="expandedDetail">
+                <td
+                  mat-cell
+                  *matCellDef="let element"
+                  [attr.colspan]="columnsStepConfirmacion.length"
+                >
+                  <div
+                    class="mat_element_detail"
+                    [@detailExpand]="
+                      element == expandedElement ? 'expanded' : 'collapsed'
+                    "
+                  >
+                    <div class="d-flex align-items-center font_weight_500">
+                      <div>Mensaje</div>
+                    </div>
+                    <div class="mat_element_description">
+                      {{ element.mensaje }}
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="columnsStepConfirmacion"
+              ></tr>
+
+              <tr
+                mat-row
+                *matRowDef="let row; columns: columnsStepConfirmacion"
+                class="mat_element_row fila cursor_pointer
+                {{
+                  row.cantidadCaracteres > maxCaracteresMensaje
+                    ? 'bg_danger_light'
+                    : ''
+                }}"
+                [class.mat_expanded_row]="expandedElement === row"
+                (click)="expandedElement = expandedElement === row ? null : row"
+              >
+              </tr>
+
+              <tr
+                mat-row
+                *matRowDef="let row; columns: ['expandedDetail']"
+                class="mat_detail_row"
+              ></tr>
+            </table>
+
+            <mat-paginator
+              [pageSizeOptions]="[5, 10, 20, 50]"
+              showFirstLastButtons
+            ></mat-paginator>
+          </div>
+        </div> -->
+
+        <cards-info-mensajes
+          [totalDefinitivoMensajes]="totalDefinitivoMensajes"
+          [valorMensajesAEnviar]="valorMensajesAEnviar"
+          [totalDefinitivoCelulares]="totalDefinitivoCelulares"
+        ></cards-info-mensajes>
+
+        <alertas-mensajes
+          [isSuperiorMaxCaracteres]="isSuperiorMaxCaracteres"
+          [countMensajesSuperioresMaxCaracteres]="
+            countMensajesSuperioresMaxCaracteres
+          "
+          [totalDefinitivoMensajes]="totalDefinitivoMensajes"
+          [totalDefinitivoCelulares]="totalDefinitivoCelulares"
+          [arrayTodosMensajes]="arrayTodosMensajes"
+          [valorMensajesAEnviar]="valorMensajesAEnviar"
+          [valorMensajeIndividual]="valorMensajeIndividual"
+          [maxCaracteresMensaje]="maxCaracteresMensaje"
+          [formConfirmacion]="formConfirmacion"
+          [formConfirmacionFields]="formConfirmacionFields"
+          [arrayCelularesExcluidos]="arrayCelularesExcluidos"
+          (updateTotalesAlertas)="updateTotalesCards($event)"
+        ></alertas-mensajes>
+
+        <tabla-mensajes
+          [dataSourceStepConfirmacion]="dataSourceStepConfirmacion"
+          [maxCaracteresMensaje]="maxCaracteresMensaje"
+          [isSuperiorMaxCaracteres]="isSuperiorMaxCaracteres"
+          [countMensajesSuperioresMaxCaracteres]="
+            countMensajesSuperioresMaxCaracteres
+          "
+          [totalDefinitivoMensajes]="totalDefinitivoMensajes"
+          [totalDefinitivoCelulares]="totalDefinitivoCelulares"
+          [arrayTodosMensajes]="arrayTodosMensajes"
+          [valorMensajesAEnviar]="valorMensajesAEnviar"
+          [valorMensajeIndividual]="valorMensajeIndividual"
+          [formConfirmacionFields]="formConfirmacionFields"
+          (updateDatosMensajes)="updateInfoMensajes($event)"
+        ></tabla-mensajes>
+
+        <div class="d-flex justify-content-center mb-3">
+          <button
+            class="btn_chec_oscuro w-25"
+            [class.cursor_not_allowed]="
+              !totalDefinitivoMensajes || !totalDefinitivoCelulares
+            "
+            mat-button
+            [disabled]="!totalDefinitivoMensajes || !totalDefinitivoCelulares"
+            (click)="showAdvertenciaSendMensajes(formConfirmacion)"
+          >
+            Enviar
+          </button>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button class="boton_chec" mat-button matStepperPrevious>
+            Anterior
+          </button>
+        </div>
+
+        <modal-mensajes-enviados
+          #modalMensajesEnviados
+        ></modal-mensajes-enviados>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>

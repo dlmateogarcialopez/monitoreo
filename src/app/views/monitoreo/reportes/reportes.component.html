@@ -1,0 +1,275 @@
+<div class="jumbotron px-4">
+  <h1 class="text-center m-0">Monitoreo - Reportes</h1>
+
+  <hr class="w-50" />
+
+  <!--
+      <div class="row col-lg-6 d-flex mx-auto d-flex justify-content-center">
+        <div class="form-group col-lg-3">
+          <label  for="ccmonth">Año</label>
+          <select class="form-control" name="miselect" [(ngModel)]="anio">
+            <option [value]="item" *ngFor="let item of anios">{{item}}</option>
+          </select>
+        </div>
+        <div class="form-group col-lg-3">
+          <label  for="ccyear">Mes</label>
+          <select class="form-control" name="miselect" [(ngModel)]="mes">
+            <option [value]="item.valor" *ngFor="let item of meses">{{item.mes}}</option>
+          </select>
+        </div>
+      </div>
+    -->
+  <div class="row mt-5 mb-3">
+    <div class="col-sm-4 col-md-2">
+      <mat-form-field class="w-100">
+        <mat-label>Año</mat-label>
+        <mat-select [(ngModel)]="anio">
+          <mat-option value="Todos">Todos</mat-option>
+          <mat-option [value]="item" *ngFor="let item of anios">{{
+            item
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-sm-4 col-md-2">
+      <mat-form-field class="w-100">
+        <mat-label>Mes</mat-label>
+        <mat-select [(ngModel)]="mes">
+          <mat-option [value]="item.valor" *ngFor="let item of meses">{{
+            item.mes
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-sm-6 col-md-5">
+      <div class="card shadow">
+        <div class="row no-gutters">
+          <div class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro">
+            <i class="fas fa-headphones fa-5x"></i>
+          </div>
+          <div class="col-md">
+            <div class="card-body">
+              <h5 class="card-title">Lucy</h5>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-text">
+                  <i class="fas fa-users fa-fw mr-1"></i>
+                  Usuarios totales
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('usuariosTtotalesLucy')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-text">
+                  <i class="fas fa-star fa-fw mr-1"></i>
+                  Calificaciones
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('calificacionesLucy')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-text">
+                  <i class="fas fa-user-edit fa-fw mr-1"></i>
+                  Usuarios frecuentes
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('usuariosFrecuentesLucy')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="card-text">
+                  <i class="fas fa-project-diagram fa-fw mr-1"></i>
+                  Usuarios por Segmento
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('usuariosSegmentoLucy')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-md-5">
+      <div class="card shadow">
+        <div class="row no-gutters">
+          <div class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro">
+            <i class="fas fa-robot fa-5x"></i>
+          </div>
+          <div class="col-md">
+            <div class="card-body">
+              <h5 class="card-title">DINP</h5>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-text">
+                  <i class="fas fa-user-friends fa-fw mr-1"></i>
+                  Usuarios inscritos
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('usuariosInscritosDinp')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-text">
+                  <i class="fas fa-sms fa-fw mr-1"></i>
+                  Usuarios que recibieron SMS
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('usuariosRecibidosMsmDinp')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="card-text">
+                  <i class="fas fa-envelope-open fa-fw mr-1"></i>
+                  Usuarios que recibieron SMS por Segmento
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('usuariosRecibidosMsmDinpSegmento')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="card-text">
+                  <i class="fas fa-bolt fa-fw mr-1"></i>
+                  Usuarios que recibieron SMS de promoción
+                </span>
+                <span
+                  class="card-text link"
+                  data-toggle="tooltip"
+                  title="Descargar"
+                  (click)="obtenerReporte('usuariosRecibidosMsmDinpPromocion')"
+                >
+                  <i class="fas fa-download"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="text-dark text-center py-2">
+    <table id="tablaReportes" class="table table-bordered shadow">
+      <thead>
+        <tr>
+          <th scope="col">Lucy</th>
+          <th scope="col">DINP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="colunasTablaReportes">
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('usuariosTtotalesLucy')"
+            >
+              Usuarios totales
+            </button>
+          </td>
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('usuariosInscritosDinp')"
+            >
+              Usuarios inscritos
+            </button>
+          </td>
+        </tr>
+        <tr class="colunasTablaReportes">
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('calificacionesLucy')"
+            >
+              Calificaciones
+            </button>
+          </td>
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('usuariosRecibidosMsmDinp')"
+            >
+              Usuarios que han recibido SMS
+            </button>
+          </td>
+        </tr>
+        <tr class="colunasTablaReportes">
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('usuariosFrecuentesLucy')"
+            >
+              Usuarios frecuentes
+            </button>
+          </td>
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('usuariosRecibidosMsmDinpSegmento')"
+            >
+              Usuarios que han recibido SMS por Segmento
+            </button>
+          </td>
+        </tr>
+        <tr class="colunasTablaReportes">
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('usuariosSegmentoLucy')"
+            >
+              Usuarios por Segmento
+            </button>
+          </td>
+          <td>
+            <button
+              class="form-control btn-reporte"
+              (click)="obtenerReporte('usuariosRecibidosMsmDinpPromocion')"
+            >
+              Usuarios que han recibido promoción SMS
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div> -->
+</div>

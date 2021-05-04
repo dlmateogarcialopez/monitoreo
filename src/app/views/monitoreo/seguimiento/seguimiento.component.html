@@ -1,0 +1,1136 @@
+<div class="jumbotron px-4 canvas_div_pdf">
+  <div class="d-flex justify-content-between align-items-center">
+    <div></div>
+    <h1 class="text-center m-0">Monitoreo - Seguimiento</h1>
+    <button type="button" class="btn p-0" (click)="getPDF()">
+      <i class="icon-cloud-download iconDescargas"></i>
+    </button>
+  </div>
+
+  <hr class="w-50" />
+
+  <form class="mt-5 mb-3" [formGroup]="formCriterioSeleccionado">
+    <div class="row align-items-baseline">
+      <div class="col-sm-4 col-md-3">
+        <mat-form-field class="w-100">
+          <mat-label>Criterio</mat-label>
+          <mat-select
+            (selectionChange)="criterioSelected()"
+            formControlName="selectCriterio"
+          >
+            <mat-option value="cuenta">Número de cuenta</mat-option>
+            <mat-option value="documento">Cédula de ciudadanía</mat-option>
+            <mat-option value="nombre">Nombre titular cuenta</mat-option>
+            <mat-option value="direccion">Dirección de inmueble</mat-option>
+            <mat-option value="telefono">Teléfono o celular</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-sm-4 col-md-3">
+        <mat-form-field class="w-100">
+          <mat-label>{{
+            objLabelInputCriterio[formCriterioSeleccionado.value.selectCriterio]
+          }}</mat-label>
+          <input
+            [type]="type"
+            id="valorSeleccionado"
+            formControlName="inputCriterio"
+            matInput
+          />
+        </mat-form-field>
+      </div>
+      <div class="col-sm-4 col-md-3">
+        <button
+          class="btn_chec_oscuro"
+          [disabled]="formCriterioSeleccionado.invalid"
+          mat-button
+          (click)="changeIndividual()"
+        >
+          Buscar
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="d-flex justify-content-between align-items-center form-group">
+    <h4>Clientes</h4>
+    <mat-form-field
+      class=""
+      appearance="outline"
+      color="primary"
+      style="font-size: 12px"
+    >
+      <mat-label style="color: black">Buscar</mat-label>
+      <input
+        matInput
+        placeholder="Filtro"
+        (input)="ServiceProvider.aplicarFiltroTabla($event, dataSource)"
+      />
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="shadow mb-5">
+    <table
+      class="table-striped sort_white_arrow"
+      mat-table
+      [dataSource]="dataSource"
+      matSort
+    >
+      <ng-container matColumnDef="NOMBRE">
+        <th
+          class="bg_chec_oscuro"
+          mat-header-cell
+          mat-sort-header
+          *matHeaderCellDef
+        >
+          Nombre
+        </th>
+        <td mat-cell *matCellDef="let datosClientes">
+          {{ datosClientes.NOMBRE | titlecase }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="NIU">
+        <th
+          class="bg_chec_oscuro"
+          mat-header-cell
+          mat-sort-header
+          *matHeaderCellDef
+        >
+          Cuenta
+        </th>
+        <td mat-cell *matCellDef="let datosClientes">
+          {{ datosClientes.NIU }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="DIRECCION">
+        <th
+          class="bg_chec_oscuro"
+          mat-header-cell
+          mat-sort-header
+          *matHeaderCellDef
+        >
+          Dirección
+        </th>
+        <td mat-cell *matCellDef="let datosClientes">
+          {{ datosClientes.DIRECCION }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="CELULAR">
+        <th
+          class="bg_chec_oscuro"
+          mat-header-cell
+          mat-sort-header
+          *matHeaderCellDef
+        >
+          Celular
+        </th>
+        <td mat-cell *matCellDef="let datosClientes">
+          {{ datosClientes.CELULAR }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnasTablaClientes"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: columnasTablaClientes"
+        class="cursor_pointer"
+        (click)="selectedUser(row.NIU, row.NOMBRE)"
+      ></tr>
+    </table>
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+
+  <ng-container *ngIf="flagUsuarioSeleccionado && datosClientes.length">
+    <h4 class="text-center m-0">
+      Cliente seleccionado: {{ usuarioSelecconado | titlecase }}
+    </h4>
+    <hr class="w-50" />
+    <form [formGroup]="dateForm" id="formCalendarSeguimiento">
+      <mat-form-field>
+        <input
+          id="calendarSeguimeito"
+          [disabled]="habilitarCalendario"
+          matInput
+          placeholder="Periodo"
+          [satDatepicker]="picker"
+          formControlName="date"
+          (dateChange)="changeFecha()"
+        />
+        <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+        <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+      </mat-form-field>
+    </form>
+    <br />
+    <br />
+    <!-- <div class="row">
+      <div *ngFor="let datos of datosTabla" class="col-sm-6 col-md-3">
+        <div class="card">
+          <div class="card-header bg_chec_oscuro">
+            {{ datos.fuente }}
+          </div>
+          <div class="card-body">
+            <div class="row no-gutters">
+              <div class="col-12 my-1 d-flex justify-content-between">
+                <strong>Consultas:</strong>
+                <span>
+                  {{ datos.nro_consultas | number: "":"es-CO" }}
+                </span>
+              </div>
+
+              <div class="col-12 my-1">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <strong> % Consultas: </strong>
+                  </div>
+                  <div class="col">
+                    <div class="clearfix">
+                      <div class="float-right">
+                        {{ datos.porce_consultas }}%
+                      </div>
+                    </div>
+                    <div class="progress progress-xs">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        [style.width.%]="datos.porce_consultas"
+                        [attr.aria-valuenow]="datos.porce_consultas"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 my-1 d-flex justify-content-between">
+                <strong>Última interacción:</strong>
+                <span>{{
+                  datos.fecha
+                    ? (datos.fecha
+                      | date: "MMM dd, yyyy":"":"es-CO"
+                      | titlecase)
+                    : "-"
+                }}</span>
+              </div>
+
+              <div class="col-12 mt-1">
+                <div
+                  *ngIf="
+                    datos.fuente === 'Lucy' && datos.nro_consultas;
+                    else templateVacio
+                  "
+                >
+                  <span
+                    class="link"
+                    [attr.data-toggle]="dataAtribute.toggle"
+                    [attr.data-target]="dataAtribute.target"
+                    >Ver conversaciones</span
+                  >
+                </div>
+                <ng-template #templateVacio>-</ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="row justify-content-center">
+      <div class="col-sm-6 col-md-5" *ngIf="tarjetaLucy">
+        <div class="card shadow">
+          <div class="row no-gutters">
+            <div
+              class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro"
+            >
+              <i
+                class="fas fa-5x"
+                [class.fa-headphones]="
+                  this.datosTablaLucy[0].fuente.idFuente === 'idLucy'
+                "
+              ></i>
+            </div>
+            <div class="col-md">
+              <div class="card-body">
+                <div
+                  class="d-flex justify-content-between align-items-baseline mb-1"
+                >
+                  <h5 class="card-title">
+                    {{ this.datosTablaLucy[0].fuente.fuente | titlecase }}
+                  </h5>
+                  <div
+                    *ngIf="
+                      this.datosTablaLucy[0].fuente.idFuente === 'idLucy' &&
+                      this.datosTablaLucy[0].nro_consultas > 0
+                    "
+                  >
+                    <button
+                      type="button"
+                      class="btn-success"
+                      mat-button
+                      [attr.data-toggle]="dataAtribute.toggle"
+                      [attr.data-target]="dataAtribute.target"
+                    >
+                      Ver conversaciones
+                    </button>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="card-text">
+                    <i class="fas fa-keyboard fa-fw"></i>
+                    Consultas
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaLucy[0].nro_consultas | number: "":"es-CO"
+                    }}
+                  </span>
+                </div>
+                <div
+                  class="row justify-content-between align-items-center card-text mb-2"
+                >
+                  <span class="col-auto">
+                    <i class="fas fa-percent fa-fw"></i>
+                    Participación
+                  </span>
+                  <div class="col-lg-5">
+                    <div class="clearfix">
+                      <div class="float-right">
+                        {{ porcentajesConsultas.pchats }}%
+                      </div>
+                    </div>
+                    <div class="progress progress-xs">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        [style.width.%]="porcentajesConsultas.pchats"
+                        [attr.aria-valuenow]="porcentajesConsultas.pchats"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="card-text">
+                    <i class="fas fa-calendar-alt fa-fw"></i>
+                    Última interacción
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaLucy[0].fecha
+                        ? (this.datosTablaLucy[0].fecha
+                          | date: "MMM dd, yyyy":"":"es-CO"
+                          | titlecase)
+                        : "-"
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-5" *ngIf="tarjetaLlamadas">
+        <div class="card shadow">
+          <div class="row no-gutters">
+            <div
+              class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro"
+            >
+              <i
+                class="fas fa-5x"
+                [class.fa-phone]="
+                  this.datosTabla[0].fuente.idFuente === 'idLlamadas'
+                "
+              ></i>
+            </div>
+            <div class="col-md">
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                  <h5 class="card-title">
+                    {{ this.datosTabla[0].fuente.fuente | titlecase }}
+                  </h5>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="card-text">
+                    <i class="fas fa-keyboard fa-fw"></i>
+                    Consultas
+                  </span>
+                  <span class="card-text">
+                    {{ this.datosTabla[0].nro_consultas | number: "":"es-CO" }}
+                  </span>
+                </div>
+                <div
+                  class="row justify-content-between align-items-center card-text mb-2"
+                >
+                  <span class="col-auto">
+                    <i class="fas fa-percent fa-fw"></i>
+                    Participación
+                  </span>
+                  <div class="col-lg-5">
+                    <div class="clearfix">
+                      <div class="float-right">
+                        {{ porcentajesConsultas.pllamadas }}%
+                      </div>
+                    </div>
+                    <div class="progress progress-xs">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        [style.width.%]="porcentajesConsultas.pllamadas"
+                        [attr.aria-valuenow]="porcentajesConsultas.pllamadas"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="card-text">
+                    <i class="fas fa-calendar-alt fa-fw"></i>
+                    Última interacción
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTabla[0].fecha
+                        ? (this.datosTabla[0].fecha
+                          | date: "MMM dd, yyyy":"":"es-CO"
+                          | titlecase)
+                        : "-"
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-5" *ngIf="tarjetaPromocion">
+        <div class="card shadow">
+          <div class="row no-gutters">
+            <div
+              class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro"
+            >
+              <i
+                class="fas fa-5x"
+                [class.fa-sms]="
+                  this.datosTablaPromocionLucy[0].fuente.idFuente ===
+                  'idPromocion'
+                "
+              ></i>
+            </div>
+            <div class="col-md">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title">
+                    {{
+                      this.datosTablaPromocionLucy[0].fuente.fuente | titlecase
+                    }}
+                  </h5>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="card-text">
+                    <i class="fas fa-keyboard fa-fw"></i>
+                    Consultas
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaPromocionLucy[0].nro_consultas
+                        | number: "":"es-CO"
+                    }}
+                  </span>
+                </div>
+                <div
+                  class="row justify-content-between align-items-center card-text mb-2"
+                >
+                  <span class="col-auto">
+                    <i class="fas fa-percent fa-fw"></i>
+                    Participación
+                  </span>
+                  <div class="col-lg-5">
+                    <div class="clearfix">
+                      <div class="float-right">
+                        {{ porcentajesConsultas.ppormocion_lucy }}%
+                      </div>
+                    </div>
+                    <div class="progress progress-xs">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        [style.width.%]="porcentajesConsultas.ppormocion_lucy"
+                        [attr.aria-valuenow]="
+                          porcentajesConsultas.ppormocion_lucy
+                        "
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="card-text">
+                    <i class="fas fa-calendar-alt fa-fw"></i>
+                    Última interacción
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaPromocionLucy[0].fecha
+                        ? (this.datosTablaPromocionLucy[0].fecha
+                          | date: "MMM dd, yyyy":"":"es-CO"
+                          | titlecase)
+                        : "-"
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-5" *ngIf="tarjetaDinp">
+        <div class="card shadow">
+          <div class="row no-gutters">
+            <div
+              class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro"
+            >
+              <i
+                class="fas fa-5x"
+                [class.fa-robot]="
+                  this.datosTablaDinp[0].fuente.idFuente === 'idDinp'
+                "
+              ></i>
+            </div>
+            <div class="col-md">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title">
+                    {{ this.datosTablaDinp[0].fuente.fuente }}
+                  </h5>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="card-text">
+                    <i class="fas fa-keyboard fa-fw"></i>
+                    Consultas
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaDinp[0].nro_consultas | number: "":"es-CO"
+                    }}
+                  </span>
+                </div>
+                <div
+                  class="row justify-content-between align-items-center card-text mb-2"
+                >
+                  <span class="col-auto">
+                    <i class="fas fa-percent fa-fw"></i>
+                    Participación
+                  </span>
+                  <div class="col-lg-5">
+                    <div class="clearfix">
+                      <div class="float-right">
+                        {{ porcentajesConsultas.pdinp }}%
+                      </div>
+                    </div>
+                    <div class="progress progress-xs">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        [style.width.%]="porcentajesConsultas.pdinp"
+                        [attr.aria-valuenow]="porcentajesConsultas.pdinp"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="card-text">
+                    <i class="fas fa-calendar-alt fa-fw"></i>
+                    Última interacción
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaDinp[0].fecha
+                        ? (this.datosTablaDinp[0].fecha
+                          | date: "MMM dd, yyyy":"":"es-CO"
+                          | titlecase)
+                        : "-"
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-5" *ngIf="tarjetaInvitacionsusp">
+        <div class="card shadow">
+          <div class="row no-gutters">
+            <div
+              class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro"
+            >
+              <i
+                class="fas fa-5x"
+                [class.fa-bolt]="
+                  this.datosTablaInvitacionSusp[0].fuente.idFuente ===
+                  'idInvitacionSus'
+                "
+              ></i>
+            </div>
+            <div class="col-md">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title">
+                    {{
+                      this.datosTablaInvitacionSusp[0].fuente.fuente | titlecase
+                    }}
+                  </h5>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="card-text">
+                    <i class="fas fa-keyboard fa-fw"></i>
+                    Consultas
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaInvitacionSusp[0].nro_consultas
+                        | number: "":"es-CO"
+                    }}
+                  </span>
+                </div>
+                <div
+                  class="row justify-content-between align-items-center card-text mb-2"
+                >
+                  <span class="col-auto">
+                    <i class="fas fa-percent fa-fw"></i>
+                    Participación
+                  </span>
+                  <div class="col-lg-5">
+                    <div class="clearfix">
+                      <div class="float-right">
+                        {{ porcentajesConsultas.pinvitacion_susp }}%
+                      </div>
+                    </div>
+                    <div class="progress progress-xs">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        [style.width.%]="porcentajesConsultas.pinvitacion_susp"
+                        [attr.aria-valuenow]="
+                          porcentajesConsultas.pinvitacion_susp
+                        "
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="card-text">
+                    <i class="fas fa-calendar-alt fa-fw"></i>
+                    Última interacción
+                  </span>
+                  <span class="card-text">
+                    {{
+                      this.datosTablaInvitacionSusp[0].fecha
+                        ? (this.datosTablaInvitacionSusp[0].fecha
+                          | date: "MMM dd, yyyy":"":"es-CO"
+                          | titlecase)
+                        : "-"
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <table
+      class="table table-responsive-sm table-outline shadow table-striped"
+    >
+      <thead>
+        <tr class="bg_chec_oscuro">
+          <th>Fuente</th>
+          <th class="text-center">Consultas</th>
+          <th class="text-center">% Consultas</th>
+          <th class="centrarFechaTablaHistorial">Fecha</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white" id="tbodyy">
+        <tr *ngFor="let datos of datosTabla">
+          <td
+            [attr.data-toggle]="dataAtribute.toggle"
+            [attr.data-target]="dataAtribute.target"
+            id="fuenteTablaSeguimiento"
+          >
+            <div>{{ datos.fuente }}</div>
+          </td>
+          <td>
+            <div class="clearfix">
+              <div class="text-center">
+                <strong>{{ datos.nro_consultas | number: "":"es-CO" }}</strong>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="clearfix">
+              <div class="float-left">
+                <strong>{{ datos.porce_consultas }}%</strong>
+              </div>
+            </div>
+            <div class="progress progress-xs d-flex">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                [style.width.%]="datos.porce_consultas"
+                [attr.aria-valuenow]="datos.porce_consultas"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </td>
+          <td>
+            <div class="clearfix">
+              <div class="text-center">
+                <strong>{{
+                  datos.fecha | date: "MMMM dd, yyyy":"":"es-CO" | titlecase
+                }}</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table> -->
+  </ng-container>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" (click)="changeColor(); mostrarchat = false">
+            <a
+              class="nav-link {{ !mostrarchat ? 'show active' : '' }}"
+              id="home-tab"
+              data-toggle="tab"
+              href="#home"
+              role="tab"
+              aria-controls="home"
+              aria-selected="true"
+              >Chats</a
+            >
+          </li>
+          <li class="nav-item" [style.background-color]="color">
+            <a
+              class="nav-link {{ mostrarchat ? 'show active' : '' }}"
+              id="profile-tab"
+              data-toggle="tab"
+              href="#profile"
+              role="tab"
+              aria-controls="profile"
+              aria-selected="false"
+              >Conversación</a
+            >
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div
+            class="tab-pane fade p-0 {{ !mostrarchat ? 'show active' : '' }}"
+            id="home"
+            role="tabpanel"
+            aria-labelledby="home-tab"
+          >
+            <div id="chatsSeguimento">
+              <ng-container
+                *ngIf="
+                  conversaciones.length;
+                  else templateInfoConversacioneSinDatos
+                "
+              >
+                <div
+                  *ngFor="let conversacion of conversaciones"
+                  class="d-flex justify-content-around align-items-center cursor_pointer"
+                  id="chats"
+                  (click)="selectConversation(conversacion)"
+                >
+                  <div>
+                    <i class="fas fa-user-circle fa-3x"></i>
+                  </div>
+                  <div id="fechaConversacion">
+                    <div class="fechaConversacion">
+                      {{
+                        conversacion.fecha
+                          | date: "MMMM dd, yyyy":"":"es-CO"
+                          | titlecase
+                      }}
+                    </div>
+                  </div>
+                  <div id="horaConversacion">
+                    {{ conversacion.fecha | date: "hh:mm a" }}
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #templateInfoConversacioneSinDatos>
+                <div class="p-3">
+                  <alerta-sin-resultados></alerta-sin-resultados>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Contenido conversación -->
+          <div
+            class="tab-pane fade {{ mostrarchat ? 'show active' : '' }}"
+            id="profile"
+            role="tabpanel"
+            aria-labelledby="profile-tab"
+          >
+            <ng-container
+              *ngIf="conversaciones.length; else templateConversacioneSinDatos"
+            >
+              <div class="message-content">
+                <div class="messages-headline">
+                  <img id="iconoLucy" src="./assets/img/lucy.jpg" alt="" />
+                  <h1 id="nombreCabecera">CHEC Grupo EPM</h1>
+                  <a class="message-action">
+                    <i class="icon-feather-trash-2"></i>
+                  </a>
+                </div>
+                <!-- Message Content Inner  mostrarchat -->
+                <div class="message-content-inner">
+                  <div *ngFor="let message of messages" class="message-bubble">
+                    <div
+                      *ngIf="message.type != 'text'"
+                      [ngClass]="{ me: message.sentBy === 'human' }"
+                      class="message-bubble"
+                    >
+                      <div class="message-bubble-inner">
+                        <div class="message-avatar">
+                          <img
+                            [src]="
+                              message.sentBy === 'human'
+                                ? message.userImg
+                                : message.botImg
+                            "
+                            alt=""
+                          />
+                        </div>
+                        <div class="message-text">
+                          <div id="contImg">
+                            <div
+                              *ngIf="message.imageUrl && imagenDescarga"
+                              #ovalo
+                              id="ovalo"
+                            ></div>
+                            <img
+                              *ngIf="message.imageUrl && imagenDescarga"
+                              #descarga
+                              [src]="cargaYdescarga"
+                              id="descarga"
+                            />
+                            <img
+                              *ngIf="message.imageUrl"
+                              [src]="message.imageUrl"
+                              class="imgweb"
+                            />
+                          </div>
+                          <p>{{ message.text }}</p>
+                          <!--
+                            <span *ngIf="!message.chips" id="hora">{{
+                            today | date: "shortTime"
+                          }}</span>
+                          -->
+                          <p *ngIf="message.webUrl">
+                            <small
+                              ><a target="__blank" [href]="message.webUrl"
+                                >Click aquí para abrir este enlace</a
+                              ></small
+                            >
+                          </p>
+                          <div *ngIf="message.chips && message.chips.length">
+                            <span
+                              *ngFor="let c of message.chips"
+                              class="chip"
+                              >{{ c.text }}</span
+                            >
+                            <!--
+                              <span id="hora">{{
+                                today | date: "shortTime"
+                              }}</span>
+-->
+                          </div>
+                        </div>
+                      </div>
+                      <div class="clearfix"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Message Content Inner / End -->
+              </div>
+            </ng-container>
+            <ng-template #templateConversacioneSinDatos>
+              <div class="p-3">
+                <alerta-sin-resultados></alerta-sin-resultados>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <!--
+        <div class="modal-footer">
+        <button type="hidden" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
+      </div>
+-->
+    </div>
+  </div>
+</div>
+
+<!--Ocultos-------------------------------------------------------------------------------------------------------------------------------------->
+<div *ngIf="false" class="col-lg-3">
+  <div class="card">
+    <div class="card-header"><i class="icon-list"></i> Conversaciones</div>
+    <div class="card-body">
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th style="text-align: center">
+              <form [formGroup]="dateForm">
+                <mat-form-field>
+                  <input
+                    disabled="{{ habilitarCalendario }}"
+                    matInput
+                    placeholder="Selecciona una fecha"
+                    [satDatepicker]="picker"
+                    formControlName="date"
+                    (dateChange)="changeFecha()"
+                  />
+                  <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+                  <sat-datepicker-toggle
+                    matSuffix
+                    [for]="picker"
+                  ></sat-datepicker-toggle>
+                </mat-form-field>
+              </form>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="tbodyHistorialConveracion">
+          <tr
+            *ngFor="let conversacion of conversaciones"
+            style="text-align: center"
+            (click)="selectConversation(conversacion)"
+          >
+            <td>
+              {{ conversacion.fecha | date: "MM-dd-yyyy" }}
+              <i class="icon-cursor"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="false" class="col-lg-3">
+  <div class="message-content">
+    <div class="messages-headline">
+      <img id="iconoLucy" src="./assets/img/lucy.jpg" alt="" />
+      <h1 id="nombreCabecera">CHEC Grupo EPM</h1>
+      <a class="message-action">
+        <i class="icon-feather-trash-2"></i>
+      </a>
+    </div>
+    <!-- Message Content Inner  mostrarchat -->
+    <div class="message-content-inner">
+      <div *ngFor="let message of messages" class="message-bubble">
+        <div
+          *ngIf="message.type != 'text'"
+          [ngClass]="{ me: message.sentBy === 'human' }"
+          class="message-bubble"
+        >
+          <div class="message-bubble-inner">
+            <div class="message-avatar">
+              <img
+                [src]="
+                  message.sentBy === 'human' ? message.userImg : message.botImg
+                "
+                alt=""
+              />
+            </div>
+            <div class="message-text">
+              <div id="contImg">
+                <div
+                  *ngIf="message.imageUrl && imagenDescarga"
+                  #ovalo
+                  id="ovalo"
+                ></div>
+                <img
+                  *ngIf="message.imageUrl && imagenDescarga"
+                  #descarga
+                  [src]="cargaYdescarga"
+                  id="descarga"
+                />
+                <img
+                  *ngIf="message.imageUrl"
+                  [src]="message.imageUrl"
+                  class="imgweb"
+                />
+              </div>
+              <p>{{ message.text }}</p>
+              <span *ngIf="!message.chips" id="hora">{{
+                today | date: "shortTime"
+              }}</span>
+              <p *ngIf="message.webUrl">
+                <small
+                  ><a target="__blank" [href]="message.webUrl"
+                    >Click aquí para abrir este enlace</a
+                  ></small
+                >
+              </p>
+              <div *ngIf="message.chips && message.chips.length">
+                <span *ngFor="let c of message.chips" class="chip">{{
+                  c.text
+                }}</span>
+                <span id="hora">{{ today | date: "shortTime" }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Message Content Inner / End -->
+  </div>
+</div>
+
+<!-- Button trigger modal -->
+<button
+  *ngIf="false"
+  type="button"
+  disabled
+  class="btn btn-primary"
+  data-toggle="modal"
+  data-target="#exampleModal"
+>
+  Conversaciones
+</button>
+
+<!--
+
+              <div class="card" id="chatsSeguimento">
+              <div class="card-body">
+                <table class="table table-sm table-hover" id="conversaciones">
+                  <thead>
+                    <tr>
+                      <th style="text-align: center;">
+                        <form [formGroup]="dateForm" id="formCalendarSeguimiento">
+                          <mat-form-field>
+                            <input id="}calendarSeguimeito" disabled={{habilitarCalendario}} matInput placeholder="Selecciona una fecha"
+                              [satDatepicker]="picker" formControlName="date" (dateChange)="changeFecha()">
+                            <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+                            <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+                          </mat-form-field>
+                        </form>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodyHistorialConveracion">
+                    <tr *ngFor="let conversacion of conversaciones" (click)="selectConversation(conversacion)">
+                      <td class="d-flex justify-content-center" >
+                        <div>
+                          <img class="rounded-circle" id="imgChatSeguimiento" src="./assets/img/avarUser.jpg" alt="">
+                          {{conversacion.fecha | date:'MM-dd-yyyy'}} <i class="icon-cursor"></i>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+
+
+            <h4>
+        Cliente seleccionado: {{ usuarioSelecconado | titlecase }}
+      </h4>
+      <table
+        class="table table-responsive-sm table-outline sombra"
+      >
+        <thead>
+          <tr class="bg-light">
+            <th>Fuente</th>
+            <th>Consultas</th>
+            <th>% Consultas</th>
+            <th class="centrarFechaTablaHistorial">Fecha</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white" id="tbodyy">
+          <tr *ngFor="let datos of datosTala">
+            <td [attr.data-toggle]="dataAtribute.toggle" [attr.data-target]="dataAtribute.target" id="fuenteTablaSeguimiento">
+              <div>{{ datos.fuente }}</div>
+              <div class="float-left">
+              </div>
+            </td>
+            <td>
+              <div class="clearfix">
+                <div class="float-left">
+                  <strong>{{ datos.nro_consultas }}</strong>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="clearfix">
+                <div class="float-left">
+                  <strong>{{ datos.porce_consultas }}%</strong>
+                </div>
+              </div>
+              <div class="progress progress-xs d-flex">
+                <div
+                  class="progress-bar bg-success"
+                  role="progressbar"
+                  [style.width.%]="datos.porce_consultas"
+                  aria-valuenow="50"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+            </td>
+            <td>
+              <div class="clearfix">
+                <div class="float-left">
+                  <strong class="centrarFechaTablaHistorial">{{
+                    datos.fecha
+                  }}</strong>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+-->

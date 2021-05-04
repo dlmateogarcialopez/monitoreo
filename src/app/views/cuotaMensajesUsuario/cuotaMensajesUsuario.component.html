@@ -1,0 +1,25 @@
+<small class="text-muted">Cuota de mensajes</small>
+<div class="clearfix">
+  <div class="float-left">
+    <strong>{{ porcentajeMensajesEnviados }}%</strong>
+  </div>
+  <div class="float-right">
+    <small class="text-muted">
+      {{ cantidaMensajesUsuarioEnviados + "/" + totalCuotaMensajesUsuario }}
+    </small>
+  </div>
+</div>
+<div class="progress progress-xs">
+  <div
+    class="progress-bar"
+    [class.bg-success]="porcentajeMensajesEnviados <= 50"
+    [class.bg-warning]="
+      porcentajeMensajesEnviados > 50 && porcentajeMensajesEnviados <= 75
+    "
+    [class.bg-danger]="porcentajeMensajesEnviados > 75"
+    role="progressbar"
+    [style.width.%]="porcentajeMensajesEnviados"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  ></div>
+</div>

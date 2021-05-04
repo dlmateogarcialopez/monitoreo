@@ -1,0 +1,43 @@
+<h5 mat-dialog-title>{{ accion }} mensaje</h5>
+<div mat-dialog-content>
+  <form [formGroup]="formMensaje">
+    <textarea
+      formControlName="mensaje"
+      class="form-control"
+      placeholder="Mensaje"
+      [rows]="
+        datosMensaje.cantidadCaracteres > maxCaracteresMensaje ? '4' : '3'
+      "
+    ></textarea>
+    <span
+      [class]="
+        mensajeField.mensaje.value?.length <= maxCaracteresMensaje
+          ? 'text-muted'
+          : 'text-danger'
+      "
+    >
+      Caracteres restantes:
+      {{ maxCaracteresMensaje - mensajeField.mensaje.value?.length }}
+    </span>
+
+    <div
+      *ngIf="
+        mensajeField.mensaje.invalid &&
+        (mensajeField.mensaje.dirty || mensajeField.mensaje.touched)
+      "
+      class="text-center m-0 text-danger texto_pequeno"
+    >
+      <span *ngIf="mensajeField.mensaje.errors.required">
+        {{ MESSAGES.requerido }}
+      </span>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions class="d-flex justify-content-end py-3">
+  <button class="btn-success" mat-button (click)="guardarMensaje()">
+    Guardar
+  </button>
+  <button class="btn-secondary" mat-button (click)="cerrarDialogo()">
+    Cerrar
+  </button>
+</div>

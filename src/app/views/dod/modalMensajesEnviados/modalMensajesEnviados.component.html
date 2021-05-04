@@ -1,0 +1,35 @@
+<div
+  bsModal
+  #modalMensajesEnviados="bs-modal"
+  [config]="{ backdrop: 'static', keyboard: false }"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center pb-0">
+        <div class="row">
+          <div class="col-12">
+            <i class="fas fa-check-circle fa-3x color_chec_claro"></i>
+          </div>
+          <div class="col-12 py-3" style="font-size: large;">
+            Los mensajes están siendo enviados. Podrás ver más detalles en el
+            <span class="font-weight-bold"> Listado de envíos</span>.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top-0 justify-content-center pt-0">
+        <button
+          type="button"
+          class="btn boton_chec"
+          (click)="hideModal()"
+        >
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

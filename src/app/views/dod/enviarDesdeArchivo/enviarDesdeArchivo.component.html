@@ -1,0 +1,1131 @@
+<div class="container">
+  <mat-horizontal-stepper [linear]="isLinear" #stepper selectedIndex="0" class="shadow">
+    <!-- Muestra números en cada step en lugar del ícono "edit" -->
+    <ng-template matStepperIcon="edit" let-index="index">
+      {{ index + 1 }}
+    </ng-template>
+
+    <!-- Paso 1 -->
+    <mat-step [stepControl]="formCargarArchivo">
+      <form [formGroup]="formCargarArchivo" class="mt-3">
+        <ng-template matStepLabel>Cargar archivo</ng-template>
+        <div class="form-group row">
+          <label class="col-auto col-form-label" id="radioEncabezadosLabel"
+            >¿El archivo a cargar contiene encabezados?</label
+          >
+          <div class="col-auto">
+            <mat-radio-group
+              formControlName="radioEncabezados"
+              aria-labelledby="radioEncabezadosLabel"
+              (change)="resetInputFile()"
+            >
+              <mat-radio-button
+                color="primary"
+                class="radioButton"
+                value="true"
+              >
+                Sí
+              </mat-radio-button>
+              <mat-radio-button
+                color="primary"
+                class="radioButton"
+                value="false"
+              >
+                No
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+          <div
+            *ngIf="
+              formCargarArchivoFields.radioEncabezados.invalid &&
+              (formCargarArchivoFields.radioEncabezados.dirty ||
+                formCargarArchivoFields.radioEncabezados.touched)
+            "
+            class="col-12 text-center m-0 text-danger texto_pequeno"
+          >
+            <span
+              *ngIf="formCargarArchivoFields.radioEncabezados.errors.required"
+            >
+              {{ MESSAGES.requerido }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div
+            *ngIf="progress && progress < 100"
+            class="col-md-12 progressArchivo"
+          >
+            <div class="progress form-group">
+              <div
+                class="progress-bar progress-bar-striped bg-success"
+                role="progressbar"
+                [style.width.%]="progress"
+              ></div>
+            </div>
+          </div>
+
+          <!-- <select name="" id="">
+            <option *ngFor="let col of encabezadosArchivoCargado" [value]="col">
+              {{ col }}
+            </option>
+          </select> -->
+
+          <div class="col-md-12">
+            <ng-container *ngIf="!progress; else templateProcesandoArchivo">
+              <div
+                class="fileupload d-flex flex-column align-items-center justify-content-center text-center cursor_pointer"
+                appDragDropFileUpload
+                (click)="fileField.click()"
+                (drop)="upload($event)"
+              >
+                <!-- (fileDropped)="upload($event)" -->
+                <img
+                  src="assets/img/upload-icon.png"
+                  height="100"
+                  alt="Cargar archivo"
+                />
+                <!-- <i class="fa fa-cloud-upload-alt fa-5x"></i> -->
+                <span class="text-muted"
+                  >Elige un archivo, o arrastra y suelta aquí</span
+                >
+                <input
+                  type="file"
+                  name="avatars"
+                  formControlName="archivo"
+                  #fileField
+                  (change)="upload($event)"
+                  accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  hidden
+                />
+              </div>
+
+              <div
+                *ngIf="
+                  formCargarArchivoFields.archivo.invalid &&
+                  (formCargarArchivoFields.archivo.dirty ||
+                    formCargarArchivoFields.archivo.touched)
+                "
+                class="row justify-content-center m-0 text-danger texto_pequeno"
+              >
+                <span *ngIf="formCargarArchivoFields.archivo.errors.required">
+                  {{ MESSAGES.requerido }}
+                </span>
+              </div>
+            </ng-container>
+            <ng-template #templateProcesandoArchivo>
+              <div
+                class="row fileupload text-center align-items-center justify-content-center mx-0"
+              >
+                <div class="col-12">
+                  <ng-container
+                    *ngIf="progress < 100; else templateArchivoProcesado"
+                  >
+                    <div>
+                      <h4>Procesando...</h4>
+                    </div>
+                  </ng-container>
+                  <ng-template #templateArchivoProcesado>
+                    <div class="mb-3">
+                      <i
+                        class="fas fa-undo fa-3x cursor_pointer"
+                        (click)="showInputFile()"
+                        ngbTooltip="Cargar nuevo archivo"
+                        container="body"
+                      >
+                      </i>
+                    </div>
+                    <div>
+                      <h5 class="m-0">{{ nombreArchivo }}</h5>
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button
+            class="boton_chec"
+            mat-button
+            matStepperNext
+            (click)="validateStep(formCargarArchivo)"
+          >
+            <!-- class="mat-button {{
+              !isNextButtonEnabled ? 'btn-light' : 'boton_chec'
+            }}" -->
+            <!-- [disabled]="!isNextButtonEnabled" -->
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Paso 2 -->
+    <mat-step [stepControl]="formTipoMensaje">
+      <form [formGroup]="formTipoMensaje" class="mt-3">
+        <ng-template matStepLabel>Tipo de mensaje</ng-template>
+        <div class="form-group row">
+          <label for="motivoEnvio" class="col-md-3 col-form-label pt-0"
+            >Motivo del envío</label
+          >
+          <div class="col-md-7">
+            <textarea
+              formControlName="textAreaMotivo"
+              class="form-control"
+              id="motivoEnvio"
+              name="motivoEnvio"
+              rows="3"
+            ></textarea>
+
+            <div
+              *ngIf="
+                formTipoMensajeFields.textAreaMotivo.invalid &&
+                (formTipoMensajeFields.textAreaMotivo.dirty ||
+                  formTipoMensajeFields.textAreaMotivo.touched)
+              "
+              class="text-center m-0 text-danger texto_pequeno"
+            >
+              <span
+                *ngIf="formTipoMensajeFields.textAreaMotivo.errors.required"
+              >
+                {{ MESSAGES.requerido }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" id="tipoMensajeLabel"
+            >Tipo de mensaje a enviar</label
+          >
+          <div class="col-md-7">
+            <mat-radio-group
+              formControlName="radioTipoMensaje"
+              class="vertical_radio_group"
+              aria-labelledby="tipoMensajeLabel"
+            >
+              <mat-radio-button
+                *ngFor="let tipo of tiposMensaje"
+                color="primary"
+                class="radioButton"
+                [value]="tipo"
+              >
+                <!-- (change)="validateControlsStepMensaje(tipo)" -->
+                Mensaje {{ tipo }}
+              </mat-radio-button>
+            </mat-radio-group>
+
+            <div
+              *ngIf="
+                formTipoMensajeFields.radioTipoMensaje.invalid &&
+                (formTipoMensajeFields.radioTipoMensaje.dirty ||
+                  formTipoMensajeFields.radioTipoMensaje.touched)
+              "
+              class="text-center m-0 text-danger texto_pequeno"
+            >
+              <span
+                *ngIf="formTipoMensajeFields.radioTipoMensaje.errors.required"
+              >
+                {{ MESSAGES.requerido }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="usuarioHasEnvioPrioritario"
+          class="form-group row align-items-baseline"
+        >
+          <label class="col-md-3 col-form-label">Envío prioritario</label>
+          <div class="col-md-7">
+            <mat-checkbox
+              formControlName="envioPrioritario"
+              color="primary"
+            ></mat-checkbox>
+            <span
+              class="col-md-2 cursor_pointer"
+              [ngbTooltip]="MESSAGES.ayudaEnvioPrioritario"
+              container="body"
+            >
+              <i class="fas fa-question-circle fa-md"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button class="boton_chec mr-1" mat-button matStepperPrevious>
+            Anterior
+          </button>
+          <button
+            class="boton_chec"
+            mat-button
+            matStepperNext
+            (click)="
+              validateStep(formTipoMensaje);
+              validateControlsStepMensaje(
+                formTipoMensajeFields.radioTipoMensaje.value
+              )
+            "
+          >
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Paso 3 -->
+    <mat-step [stepControl]="formMensaje">
+      <form [formGroup]="formMensaje" class="mt-3">
+        <ng-template matStepLabel>Mensaje</ng-template>
+        <label class="border-bottom font_weight_500 mb-3">
+          <!-- Si el mensaje es "general" -->
+          {{
+            formTipoMensajeFields.radioTipoMensaje.value === tiposMensaje[0]
+              ? "Selecciona el campo del archivo cargado correspondiente al celular"
+              : "Selecciona los campos a partir de las columnas del archivo cargado"
+          }}
+        </label>
+        <div class="form-group row align-items-baseline">
+          <label for="selectCelular" class="col-md-3 col-form-label"
+            >Celular</label
+          >
+          <div class="col-md-4">
+            <mat-form-field class="w-100" floatLabel="never">
+              <select
+                formControlName="selectCelular"
+                id="selectCelular"
+                matNativeControl
+              >
+                <option value="">Selecciona</option>
+                <option
+                  *ngFor="let columna of encabezadosArchivoCargado"
+                  [value]="columna"
+                  >{{ columna }}</option
+                >
+              </select>
+            </mat-form-field>
+
+            <div
+              *ngIf="
+                formMensajeFields.selectCelular.invalid &&
+                (formMensajeFields.selectCelular.dirty ||
+                  formMensajeFields.selectCelular.touched)
+              "
+              class="text-center m-0 text-danger texto_pequeno"
+            >
+              <span *ngIf="formMensajeFields.selectCelular.errors.required">
+                {{ MESSAGES.requerido }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Agregar campos si el tipo de mensaje es "individual" -->
+          <ng-container
+            *ngIf="
+              formTipoMensajeFields.radioTipoMensaje.value === tiposMensaje[1]
+            "
+          >
+            <div class="col-md-3">
+              @celular
+            </div>
+            <div class="col-md-2">
+              <a
+                mat-mini-fab
+                ngbTooltip="Agregar campo"
+                container="body"
+                (click)="agregarCampo()"
+                class="boton_redondo boton_chec"
+              >
+                <i class="fas fa-plus"></i>
+              </a>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Si el mensaje es "general" o "individual" -->
+        <ng-container
+          *ngIf="
+            formTipoMensajeFields.radioTipoMensaje.value === tiposMensaje[0] ||
+              formTipoMensajeFields.radioTipoMensaje.value === tiposMensaje[1];
+            else templatePrecargado
+          "
+        >
+          <!-- Si el mensaje es "general" -->
+          <ng-container
+            *ngIf="
+              formTipoMensajeFields.radioTipoMensaje.value === tiposMensaje[0];
+              else templateIndividual
+            "
+          >
+          </ng-container>
+
+          <!-- Si el mensaje es "individual" -->
+          <ng-template #templateIndividual>
+            <ng-container
+              formArrayName="formArrayNuevosCampos"
+              *ngFor="
+                let campoSeleccionado of formMensajeFields.formArrayNuevosCampos
+                  .controls;
+                let i = index
+              "
+            >
+              <ng-container [formGroupName]="i">
+                <div class="form-group row align-items-baseline">
+                  <div class="col-md-3">
+                    <mat-form-field class="w-100" floatLabel="never">
+                      <mat-label>Nombre del campo</mat-label>
+                      <input
+                        type="text"
+                        formControlName="inputCampoAgregado"
+                        #nombreCampo
+                        matInput
+                        (blur)="
+                          addCampoArrayMarcadores(
+                            replaceWhitespace(nombreCampo.value),
+                            i
+                          )
+                        "
+                      />
+                      <!-- (input)="check($event)" -->
+                      <!-- (keydown)="acceptLettersOnly($event)" -->
+                      <!-- pattern="[a-zA-Z]+" -->
+                    </mat-form-field>
+                    <div
+                      *ngIf="
+                        campoSeleccionado.controls.inputCampoAgregado.invalid &&
+                        (campoSeleccionado.controls.inputCampoAgregado.dirty ||
+                          campoSeleccionado.controls.inputCampoAgregado.touched)
+                      "
+                      class="text-center m-0 text-danger texto_pequeno"
+                    >
+                      <span
+                        *ngIf="
+                          campoSeleccionado.controls.inputCampoAgregado.errors
+                            .required
+                        "
+                      >
+                        {{ MESSAGES.requerido }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <mat-form-field class="w-100">
+                      <select
+                        id=""
+                        formControlName="selectCampoAgregado"
+                        matNativeControl
+                      >
+                        <option value="">Selecciona</option>
+                        <option
+                          *ngFor="let columna of encabezadosArchivoCargado"
+                          [value]="columna"
+                          >{{ columna }}</option
+                        >
+                      </select>
+                    </mat-form-field>
+
+                    <div
+                      *ngIf="
+                        campoSeleccionado.controls.selectCampoAgregado
+                          .invalid &&
+                        (campoSeleccionado.controls.selectCampoAgregado.dirty ||
+                          campoSeleccionado.controls.selectCampoAgregado
+                            .touched)
+                      "
+                      class="text-center m-0 text-danger texto_pequeno"
+                    >
+                      <span
+                        *ngIf="
+                          campoSeleccionado.controls.selectCampoAgregado.errors
+                            .required
+                        "
+                      >
+                        {{ MESSAGES.requerido }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3 text-break">
+                    <ng-container *ngIf="nombreCampo.value">
+                      @{{ replaceWhitespace(nombreCampo.value) }}
+                      <input
+                        type="hidden"
+                        formControlName="inputCampoAgregadoMarcador"
+                      />
+                    </ng-container>
+                  </div>
+
+                  <div class="col-md-2">
+                    <a
+                      mat-mini-fab
+                      color="warn"
+                      ngbTooltip="Eliminar campo"
+                      container="body"
+                      (click)="
+                        removeCampoArrayMarcadores(i); eliminarCampo($event, i)
+                      "
+                      class="boton_redondo"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </a>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </ng-template>
+
+          <!-- <label class="border-bottom font_weight_500 mb-3">
+            Escribe el mensaje a enviar
+          </label> -->
+
+          <!-- <hr> -->
+          <!-- <div class="form-group row">
+            ContentEditable
+            <div
+              contenteditable
+              formControlName="textAreaMensaje"
+              [mention]="arrayMarcadores"
+              [mentionConfig]="{
+                insertHTML: true,
+                mentionSelect: insertSpanText
+              }"
+              role="textarea"
+              class="form-control text-break"
+            ></div> -->
+
+          <!-- [mentionConfig]="marcadoresConfig" -->
+          <!-- {{ formMensajeFields.textAreaMensaje.value }} -->
+          <!-- <textarea-expanded [formControl]="controlsss"></textarea-expanded> -->
+          <!-- </div> -->
+
+          <!-- Este elemento se muestra tanto para mensaje general como para individual  -->
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label m-0 pt-0" for="mensaje"
+              >Mensaje {{ formTipoMensajeFields.radioTipoMensaje.value }}</label
+            >
+            <div class="col-md-7">
+              <!-- Si el mensaje seleccionado es individual, agregar en el textarea de Mensaje las propiedades [mention] y [mentionConfig]; sino, quitar estas propiedades -->
+              <ng-container
+                *ngIf="
+                  formTipoMensajeFields.radioTipoMensaje.value ===
+                    tiposMensaje[1];
+                  else templateTextAreaMensajeGeneral
+                "
+              >
+                <textarea
+                  formControlName="textAreaMensaje"
+                  [mention]="arrayMarcadores"
+                  [mentionConfig]="marcadoresConfig"
+                  (opened)="ServiceProvider.showContainerOverflow()"
+                  (closed)="ServiceProvider.hideContainerOverflow()"
+                  class="form-control"
+                  id="mensaje"
+                  name="mensaje"
+                  rows="3"
+                ></textarea>
+              </ng-container>
+
+              <ng-template #templateTextAreaMensajeGeneral>
+                <textarea
+                  formControlName="textAreaMensaje"
+                  class="form-control"
+                  id="mensaje"
+                  name="mensaje"
+                  rows="3"
+                ></textarea>
+              </ng-template>
+
+              <span
+                [class]="
+                  formMensajeFields.textAreaMensaje.value?.length <=
+                  maxCaracteresMensaje
+                    ? 'text-muted'
+                    : 'text-danger'
+                "
+              >
+                Caracteres restantes:
+                {{
+                  maxCaracteresMensaje -
+                    formMensajeFields.textAreaMensaje.value?.length
+                }}
+              </span>
+              <!-- Mostrar esta ayuda solo cuando el mensaje es individual -->
+              <span
+                *ngIf="
+                  formTipoMensajeFields.radioTipoMensaje.value ===
+                  tiposMensaje[1]
+                "
+                class="cursor_pointer"
+                [ngbTooltip]="MESSAGES.ayudaCaracteresRestantes"
+                container="body"
+              >
+                <i class="fas fa-question-circle fa-md"></i>
+              </span>
+
+              <div
+                *ngIf="
+                  formMensajeFields.textAreaMensaje.invalid &&
+                  (formMensajeFields.textAreaMensaje.dirty ||
+                    formMensajeFields.textAreaMensaje.touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span *ngIf="formMensajeFields.textAreaMensaje.errors.required">
+                  {{ MESSAGES.requerido }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Si el mensaje es "precargado" -->
+        <ng-template #templatePrecargado>
+          <div class="form-group row align-items-baseline">
+            <label for="selectMensajePrecargado" class="col-md-3 col-form-label"
+              >Mensaje {{ formTipoMensajeFields.radioTipoMensaje.value }}
+            </label>
+            <div class="col-md-4">
+              <mat-form-field class="w-100" floatLabel="never">
+                <select
+                  formControlName="selectMensajePrecargado"
+                  id="selectMensajePrecargado"
+                  matNativeControl
+                >
+                  <option value="">Selecciona</option>
+                  <option
+                    *ngFor="let columna of encabezadosArchivoCargado"
+                    [value]="columna"
+                    >{{ columna }}</option
+                  >
+                </select>
+              </mat-form-field>
+
+              <div
+                *ngIf="
+                  formMensajeFields.selectMensajePrecargado.invalid &&
+                  (formMensajeFields.selectMensajePrecargado.dirty ||
+                    formMensajeFields.selectMensajePrecargado.touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span
+                  *ngIf="
+                    formMensajeFields.selectMensajePrecargado.errors.required
+                  "
+                >
+                  {{ MESSAGES.requerido }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+        <div class="d-flex justify-content-end">
+          <button class="boton_chec mr-1" mat-button matStepperPrevious>
+            Anterior
+          </button>
+          <button
+            class="boton_chec"
+            mat-button
+            matStepperNext
+            (click)="handleFormMensaje(formMensaje)"
+          >
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Paso 4 -->
+    <mat-step [stepControl]="formConfirmacion">
+      <form [formGroup]="formConfirmacion" class="mt-3">
+        <ng-template matStepLabel>Confirmación</ng-template>
+        <!-- <div class="row justify-content-center mx-3"> -->
+
+        <!-- <div class="col-sm-7 col-md-3">
+            <div class="card">
+              <div class="card-body p-0 clearfix">
+                <i
+                  class="fa fa-envelope bg-success p-4 font-2xl mr-3 float-left"
+                ></i>
+                <div class="h5 text-info mb-0 pt-3">
+                  {{ totalDefinitivoMensajes }}
+                </div>
+                <div class="text-muted text-uppercase font-weight-bold font-xs">
+                  Mensajes a enviar
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+        <!-- <div class="col-sm-7 col-md-3">
+            <div class="card">
+              <div class="card-body p-0 clearfix">
+                <i
+                  class="fa fa-dollar-sign bg-success p-4 font-2xl mr-3 float-left"
+                ></i>
+                <div class="h5 text-info mb-0 pt-3">
+                  {{ valorMensajesAEnviar | currency: "":"$":"1.0-0" }}
+                </div>
+                <div class="text-muted text-uppercase font-weight-bold font-xs">
+                  Valor mensajes
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+        <!-- <div class="col-sm-7 col-md-3">
+            <div class="card">
+              <div class="card-body p-0 clearfix">
+                <i
+                  class="fa fa-phone bg-success p-4 font-2xl mr-3 float-left"
+                ></i>
+                <div class="h5 text-info mb-0 pt-3">
+                  {{ totalDefinitivoCelulares }}
+                </div>
+                <div class="text-muted text-uppercase font-weight-bold font-xs">
+                  Celulares válidos
+                </div>
+              </div>
+            </div>
+          </div> -->
+        <cards-info-mensajes
+          [totalDefinitivoMensajes]="totalDefinitivoMensajes"
+          [valorMensajesAEnviar]="valorMensajesAEnviar"
+          [totalDefinitivoCelulares]="totalDefinitivoCelulares"
+        ></cards-info-mensajes>
+        <!-- </div> -->
+
+        <!-- <div class="row justify-content-center">
+          <div class="col-sm-12 col-md-3">
+            <div class="card h-100 text-white bg-success text-center mb-0">
+              <div
+                class="card-body d-flex justify-content-center align-items-center"
+              >
+                <span>
+                  Se enviarán {{ totalDefinitivoMensajes }} mensajes
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="card h-100 text-white bg-success text-center mb-0">
+              <div
+                class="card-body d-flex justify-content-center align-items-center"
+              >
+                <span> Celulares válidos: {{ totalDefinitivoCelulares }} </span>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+        <!-- <ng-container *ngIf="arrayCelularesExcluidos.length">
+          <div class="row align-items-center">
+            <div
+              class="col-md-auto col-lg-auto alert alert-danger mx-5"
+              role="alert"
+            >
+              <span class="mr-2">
+                <i class="fas fa-exclamation-circle fa-lg"></i>
+              </span>
+              <span>
+                {{ arrayCelularesExcluidos.length }}
+                {{
+                  arrayCelularesExcluidos.length === 1
+                    ? "celular excede"
+                    : "celulares exceden"
+                }}
+                la cuota de envío a clientes.
+              </span>
+              <span class="link" (click)="modalCelularesExcluidos.show()"
+                >Ver celulares
+              </span>
+            </div>
+          </div>
+
+          <div
+            bsModal
+            #modalCelularesExcluidos="bs-modal"
+            class="modal fade"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="myModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header px-3">
+                  <h5 class="modal-title m-0">Celulares excluidos</h5>
+                  <button
+                    type="button"
+                    class="close"
+                    (click)="modalCelularesExcluidos.hide()"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="text-justify">
+                    {{ MESSAGES.ayudaMensajesCuotaCliente }}
+                  </p>
+                  <div class="overflow-auto" style="max-height: 30vh;">
+                    <ul class="mb-0">
+                      <li
+                        *ngFor="let celularExcluido of arrayCelularesExcluidos"
+                      >
+                        {{ celularExcluido }}
+                      </li>
+                    </ul>
+                  </div>
+                  <p class="mt-3 mb-0">
+                    Total: {{ arrayCelularesExcluidos.length }}
+                  </p>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="modalCelularesExcluidos.hide()"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container> -->
+
+        <!-- <ng-container *ngIf="isSuperiorMaxCaracteres">
+          <div class="row align-items-center">
+            <div
+              class="col-md-auto col-lg-auto alert alert-warning mx-5"
+              role="alert"
+            >
+              <span class="mr-2">
+                <i class="fas fa-exclamation-triangle fa-lg"></i>
+              </span>
+              <span>
+                {{ countMensajesSuperioresMaxCaracteres }}
+                {{
+                  countMensajesSuperioresMaxCaracteres === 1
+                    ? "mensaje excede"
+                    : "mensajes exceden"
+                }}
+                los 160 caracteres.
+              </span>
+              <span
+                class="link"
+                (click)="
+                  isCollapsedMensajesSuperiores = !isCollapsedMensajesSuperiores
+                "
+                >{{ isCollapsedMensajesSuperiores ? "Más" : "Menos" }}
+                información
+              </span>
+            </div>
+
+            <div
+              class="col-md-7 alert alert-light mx-5 mb-0"
+              [collapse]="isCollapsedMensajesSuperiores"
+              [isAnimated]="true"
+              role="alert"
+            >
+              {{ MESSAGES.ayudaMensajesSuperiores }}
+            </div>
+          </div>
+
+          <div class="form-group row ml-3 mb-0">
+            <label
+              class="col-md-auto col-form-label"
+              id="mensajesSuperioresLabel"
+              >¿Deseas enviar también estos mensajes?</label
+            >
+            <div class="col-md-auto">
+              <mat-radio-group
+                formControlName="radioMensajesSuperiores"
+                aria-labelledby="mensajesSuperioresLabel"
+                (change)="setMensajesAEnviar($event)"
+              >
+                <mat-radio-button
+                  color="primary"
+                  class="radioButton"
+                  value="true"
+                >
+                  Sí
+                </mat-radio-button>
+                <mat-radio-button
+                  color="primary"
+                  class="radioButton"
+                  value="false"
+                >
+                  No
+                </mat-radio-button>
+              </mat-radio-group>
+
+              <div
+                *ngIf="
+                  formConfirmacionFields.radioMensajesSuperiores.invalid &&
+                  (formConfirmacionFields.radioMensajesSuperiores.dirty ||
+                    formConfirmacionFields.radioMensajesSuperiores.touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span
+                  *ngIf="
+                    formConfirmacionFields.radioMensajesSuperiores.errors
+                      .required
+                  "
+                >
+                  {{ MESSAGES.requerido }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container> -->
+
+        <alertas-mensajes
+          [isSuperiorMaxCaracteres]="isSuperiorMaxCaracteres"
+          [countMensajesSuperioresMaxCaracteres]="
+            countMensajesSuperioresMaxCaracteres
+          "
+          [totalDefinitivoMensajes]="totalDefinitivoMensajes"
+          [totalDefinitivoCelulares]="totalDefinitivoCelulares"
+          [arrayTodosMensajes]="arrayTodosMensajes"
+          [valorMensajesAEnviar]="valorMensajesAEnviar"
+          [valorMensajeIndividual]="valorMensajeIndividual"
+          [maxCaracteresMensaje]="maxCaracteresMensaje"
+          [formConfirmacion]="formConfirmacion"
+          [formConfirmacionFields]="formConfirmacionFields"
+          [arrayCelularesExcluidos]="arrayCelularesExcluidos"
+          (updateTotalesAlertas)="updateTotalesCards($event)"
+        ></alertas-mensajes>
+
+        <tabla-mensajes
+          [dataSourceStepConfirmacion]="dataSourceStepConfirmacion"
+          [maxCaracteresMensaje]="maxCaracteresMensaje"
+          [isSuperiorMaxCaracteres]="isSuperiorMaxCaracteres"
+          [countMensajesSuperioresMaxCaracteres]="
+            countMensajesSuperioresMaxCaracteres
+          "
+          [totalDefinitivoMensajes]="totalDefinitivoMensajes"
+          [totalDefinitivoCelulares]="totalDefinitivoCelulares"
+          [arrayTodosMensajes]="arrayTodosMensajes"
+          [valorMensajesAEnviar]="valorMensajesAEnviar"
+          [valorMensajeIndividual]="valorMensajeIndividual"
+          [formConfirmacionFields]="formConfirmacionFields"
+          (updateDatosMensajes)="updateInfoMensajes($event)"
+        ></tabla-mensajes>
+
+        <!-- <div class="row justify-content-center">
+          <div class="mat-elevation-z8 mx-5 mt-4 mb-5">
+            <div
+              class="d-flex justify-content-between align-items-center bg-white py-2 px-3"
+            >
+              <div class="">
+                <h5 class="m-0">Mensajes</h5>
+              </div>
+            </div>
+
+            <table
+              class="mat-elevation-z8"
+              mat-table
+              [dataSource]="dataSourceStepConfirmacion"
+              multiTemplateDataRows
+              matSort
+              matSortActive="cantidadCaracteres"
+              matSortDirection="desc"
+            >
+              <ng-container matColumnDef="celular">
+                <th
+                  class="px-4"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Celular
+                </th>
+                <td class="px-4" mat-cell *matCellDef="let datosMensaje">
+                  {{ datosMensaje.celular }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="mensaje">
+                <th
+                  class="px-4"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Mensaje
+                </th>
+                <td
+                  class="px-4"
+                  mat-cell
+                  *matCellDef="let datosMensaje"
+                  [ngbTooltip]="datosMensaje.mensaje"
+                  container="body"
+                >
+                  <span class="d-block text-truncate">
+                    {{ datosMensaje.mensaje }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cantidadCaracteres">
+                <th
+                  class="px-4"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Cantidad de caracteres &nbsp;
+                  <span
+                    [ngbTooltip]="MESSAGES.ayudaCantidadCaracteres"
+                    container="body"
+                  >
+                    <i class="fas fa-question-circle fa-lg"></i>
+                  </span>
+                </th>
+                <td
+                  class="text-center px-4"
+                  mat-cell
+                  *matCellDef="let datosMensaje"
+                >
+                  {{ datosMensaje.cantidadCaracteres }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cantidadMensajesPorUsuario">
+                <th
+                  class="px-4"
+                  mat-header-cell
+                  mat-sort-header
+                  *matHeaderCellDef
+                >
+                  Cantidad de mensajes &nbsp;
+                  <span
+                    [ngbTooltip]="MESSAGES.ayudaCantidadMensajes"
+                    container="body"
+                  >
+                    <i class="fas fa-question-circle fa-lg"></i>
+                  </span>
+                </th>
+                <td
+                  class="text-center px-4"
+                  mat-cell
+                  *matCellDef="let datosMensaje"
+                >
+                  {{ datosMensaje.cantidadMensajes }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="accion">
+                <th class="text-center px-4" mat-header-cell *matHeaderCellDef>
+                  Acción
+                </th>
+                <td
+                  class="text-center px-4"
+                  mat-cell
+                  *matCellDef="let datosMensaje"
+                >
+                  <a
+                    class="bg_ghostwhite"
+                    mat-stroked-button
+                    ngbTooltip="Editar mensaje"
+                    container="body"
+                    (click)="
+                      openDialog('Editar', datosMensaje);
+                      $event.stopPropagation()
+                    "
+                  >
+                    <i class="fas fa-pen"></i>
+                  </a>
+                </td>
+              </ng-container>
+
+              <p>
+                Expanded Content Column - The detail row is made up of this one
+                column that spans across all columns
+              </p>
+              <ng-container matColumnDef="expandedDetail">
+                <td
+                  mat-cell
+                  *matCellDef="let element"
+                  [attr.colspan]="columnsStepConfirmacion.length"
+                >
+                  <div
+                    class="mat_element_detail"
+                    [@detailExpand]="
+                      element == expandedElement ? 'expanded' : 'collapsed'
+                    "
+                  >
+                    <div class="d-flex align-items-center font_weight_500">
+                      <div>Mensaje</div>
+                    </div>
+                    <div class="mat_element_description">
+                      {{ element.mensaje }}
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="columnsStepConfirmacion"
+              ></tr>
+
+              <tr
+                mat-row
+                *matRowDef="let row; columns: columnsStepConfirmacion"
+                class="mat_element_row cursor_pointer"
+                [class.bg_danger_light]="row.excluir"
+                [class.alert-warning]="
+                  row.cantidadCaracteres > maxCaracteresMensaje
+                "
+                [class.mat_expanded_row]="expandedElement === row"
+                (click)="expandedElement = expandedElement === row ? null : row"
+              ></tr>
+
+              <tr
+                mat-row
+                *matRowDef="let row; columns: ['expandedDetail']"
+                class="mat_detail_row"
+              ></tr>
+            </table>
+
+            <mat-paginator
+              [pageSizeOptions]="[5, 10, 20, 50]"
+              showFirstLastButtons
+            ></mat-paginator>
+          </div>
+        </div> -->
+
+        <div class="d-flex justify-content-center mb-3">
+          <button
+            class="btn_chec_oscuro w-25"
+            [class.cursor_not_allowed]="
+              !totalDefinitivoMensajes || !totalDefinitivoCelulares
+            "
+            mat-button
+            [disabled]="!totalDefinitivoMensajes || !totalDefinitivoCelulares"
+            (click)="showAdvertenciaSendMensajes(formConfirmacion)"
+          >
+            Enviar
+          </button>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button class="boton_chec" mat-button matStepperPrevious>
+            Anterior
+          </button>
+        </div>
+
+        <modal-mensajes-enviados
+          #modalMensajesEnviados
+        ></modal-mensajes-enviados>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>

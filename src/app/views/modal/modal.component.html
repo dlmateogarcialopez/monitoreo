@@ -1,0 +1,57 @@
+<div
+  class="modal-header m-0 p-0 position-relative"
+  [ngClass]="{
+    modal_success_bg: estilo == 'success',
+    modal_warning_bg: estilo == 'warning',
+    modal_danger_bg: estilo == 'danger'
+  }"
+>
+  <div class="d-flex justify-content-center align-items-center w-100">
+    <i
+      class="fas fa-5x py-3 animated fadeInRight"
+      [ngClass]="{
+        'modal_success_bg fa-check-circle': estilo == 'success',
+        'modal_warning_bg fa-exclamation-triangle': estilo == 'warning',
+        'modal_danger_bg fa-times-circle': estilo == 'danger'
+      }"
+    >
+    </i>
+  </div>
+  <div
+    class="text-white position-absolute cursor_pointer"
+    style="right: 10px; top:10px; background:transparent; font-size: 15px;"
+    (click)="activeModal.dismiss('Cross click')"
+  >
+    <i class="fas fa-times"></i>
+  </div>
+</div>
+<div class="modal-body animated bounceInRight">
+  <h5 class="arthur font-weight-bold text-center p-0 m-0 mt-1">
+    ¡{{ titulo }}!
+  </h5>
+  <h6 class="my-0 mt-2 arthur text-center">{{ cuerpo }}</h6>
+</div>
+<div class="modal-footer d-flex justify-content-center">
+  <a
+    *ngIf="component"
+    class="btn cursor_pointer waves-effect waves-light"
+    [ngClass]="{
+      modal_success_bg: estilo == 'success',
+      modal_warning_bg: estilo == 'warning',
+      modal_danger_bg: estilo == 'danger'
+    }"
+    (click)="funcion_ok(); activeModal.close('Close click')"
+    >Aceptar</a
+  >
+
+  <a
+    class="btn cursor_pointer waves-effect waves-light"
+    [ngClass]="{
+      modal_success_bg: estilo == 'success',
+      modal_warning_bg: estilo == 'warning',
+      modal_danger_bg: estilo == 'danger'
+    }"
+    (click)="activeModal.close('Close click')"
+    >Cerrar</a
+  >
+</div>

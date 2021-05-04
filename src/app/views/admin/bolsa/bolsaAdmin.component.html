@@ -1,0 +1,251 @@
+<div class="container-fluid pb-4">
+  <div class="row">
+    <div class="col-sm col-md-3">
+      <adminNavBar></adminNavBar>
+    </div>
+    <div class="col">
+      <div class="tab-content shadow pt-2 pb-3 px-3">
+        <h3 class="my-2">Bolsa de mensajes</h3>
+        <hr class="mt-0" />
+
+        <div class="form-group row align-items-center">
+          <label class="col-md-3 col-form-label" for="nombreBolsa"
+            >Bolsa a consultar</label
+          >
+          <div [formGroup]="formBolsas" class="col-md-3">
+            <mat-form-field class="w-100">
+              <!-- <mat-label>Bolsa</mat-label> -->
+              <select
+                formControlName="nombreBolsa"
+                id="nombreBolsa"
+                matNativeControl
+                #nombreBolsa
+                (change)="getBolsaMensajesIndividual(nombreBolsa.value)"
+              >
+                <option
+                  *ngFor="let nombreBolsa of bolsasMensaje"
+                  [value]="nombreBolsa"
+                >
+                  {{ nombreBolsa }}
+                </option>
+              </select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row align-items-center">
+          <div class="col-12">
+            <span class="h5_like"
+              >{{
+                nombreBolsa.value === "UM"
+                  ? "Saldo disponible"
+                  : "Precio mensajes enviados"
+              }}</span
+            >
+            <span class="bg-success h5_like p-1">
+              <i class="fas fa-dollar-sign"></i>
+              {{ bolsaDineroMensajes | number }}
+            </span>
+          </div>
+        </div>
+
+        <hr />
+
+        <div [hidden]="nombreBolsa.value !== 'UM'">
+          <h5>Mensajes disponibles</h5>
+          <p class="m-0">
+            <span class="font_weight_500">
+              Unidireccionales:
+            </span>
+            <span>
+              {{ cantidadMensajesUnidireccionales | number: "1.0-0" }}
+            </span>
+          </p>
+
+          <p class="m-0">
+            <span class="font_weight_500">
+              Bidireccionales:
+            </span>
+            <span>
+              {{ cantidadMensajesBidireccionales | number: "1.0-0" }}
+            </span>
+          </p>
+          <hr />
+        </div>
+
+        <h5>Valor mensaje unitario</h5>
+        <form [formGroup]="formValorMensajeUnitario">
+          <div class="row mb-4">
+            <label
+              class="col-md-3 col-form-label"
+              for="valorMensajeUnidireccional"
+              >Mensaje unidireccional</label
+            >
+            <div class="col-md-3">
+              <div class="input-prepend input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$</span>
+                </div>
+                <input
+                  type="number"
+                  formControlName="valorMensajeUnidireccional"
+                  class="form-control"
+                  id="valorMensajeUnidireccional"
+                />
+              </div>
+              <div
+                *ngIf="
+                  formValorMensajeUnitarioFields.valorMensajeUnidireccional
+                    .invalid &&
+                  (formValorMensajeUnitarioFields.valorMensajeUnidireccional
+                    .dirty ||
+                    formValorMensajeUnitarioFields.valorMensajeUnidireccional
+                      .touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span
+                  *ngIf="
+                    formValorMensajeUnitarioFields.valorMensajeUnidireccional
+                      .errors.required
+                  "
+                >
+                  {{ MESSAGES.requerido }}
+                </span>
+                <span
+                  *ngIf="
+                    formValorMensajeUnitarioFields.valorMensajeUnidireccional
+                      .errors.min
+                  "
+                >
+                  {{ MESSAGES.min }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <label
+              class="col-md-3 col-form-label"
+              for="valorMensajeBidireccional"
+              >Mensaje bidireccional</label
+            >
+            <div class="col-md-3">
+              <div class="input-prepend input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$</span>
+                </div>
+                <input
+                  type="number"
+                  formControlName="valorMensajeBidireccional"
+                  class="form-control"
+                  id="valorMensajeBidireccional"
+                />
+              </div>
+              <div
+                *ngIf="
+                  formValorMensajeUnitarioFields.valorMensajeBidireccional
+                    .invalid &&
+                  (formValorMensajeUnitarioFields.valorMensajeBidireccional
+                    .dirty ||
+                    formValorMensajeUnitarioFields.valorMensajeBidireccional
+                      .touched)
+                "
+                class="text-center m-0 text-danger texto_pequeno"
+              >
+                <span
+                  *ngIf="
+                    formValorMensajeUnitarioFields.valorMensajeBidireccional
+                      .errors.required
+                  "
+                >
+                  {{ MESSAGES.requerido }}
+                </span>
+                <span
+                  *ngIf="
+                    formValorMensajeUnitarioFields.valorMensajeBidireccional
+                      .errors.min
+                  "
+                >
+                  {{ MESSAGES.min }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col">
+              <button
+                class="bg_chec_oscuro"
+                mat-button
+                (click)="updateValorMensajeUnitarioBolsa(nombreBolsa.value)"
+              >
+                Actualizar
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div [hidden]="nombreBolsa.value !== 'UM'">
+          <hr />
+          <h5>Adicionar saldo</h5>
+          <form [formGroup]="formAdicionarSaldo">
+            <div class="row mb-2">
+              <label class="col-md-3 col-form-label" for="valorSaldoAdicionar"
+                >Saldo</label
+              >
+              <div class="col-md-3">
+                <div class="input-prepend input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                  </div>
+                  <input
+                    type="number"
+                    formControlName="valorSaldoAdicionar"
+                    class="form-control"
+                    id="valorSaldoAdicionar"
+                  />
+                </div>
+
+                <div
+                  *ngIf="
+                    formAdicionarSaldoFields.valorSaldoAdicionar.invalid &&
+                    (formAdicionarSaldoFields.valorSaldoAdicionar.dirty ||
+                      formAdicionarSaldoFields.valorSaldoAdicionar.touched)
+                  "
+                  class="text-center m-0 text-danger texto_pequeno"
+                >
+                  <span
+                    *ngIf="
+                      formAdicionarSaldoFields.valorSaldoAdicionar.errors
+                        .required
+                    "
+                  >
+                    {{ MESSAGES.requerido }}
+                  </span>
+                  <span
+                    *ngIf="
+                      formAdicionarSaldoFields.valorSaldoAdicionar.errors.min
+                    "
+                  >
+                    {{ MESSAGES.min }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <button
+                  class="bg_chec_oscuro"
+                  mat-button
+                  (click)="adicionarSaldoBolsa(nombreBolsa.value)"
+                >
+                  Adicionar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

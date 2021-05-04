@@ -1,0 +1,395 @@
+<div class="jumbotron px-4 canvas_div_pdf" [hidden]="!isVistaCargada">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div></div>
+    <h1 class="text-center m-0">Monitoreo Lucy - Dashboard</h1>
+    <button type="button" class="btn p-0" (click)="getPDF()">
+      <i class="icon-cloud-download iconDescargas"></i>
+    </button>
+  </div>
+
+  <hr class="w-50" />
+
+  <form class="mt-5" [formGroup]="dateForm">
+    <mat-form-field floatLabel="always">
+      <mat-label>Periodo</mat-label>
+      <input matInput [satDatepicker]="picker" formControlName="date" (dateChange)="change()" />
+      <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+      <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+    </mat-form-field>
+  </form>
+
+  <div class="row align-items-center">
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-md-12" id="tarjetaPagWeb">
+          <div class="card shadow">
+            <div class="card-body pb-0">
+              <div class="row">
+                <div class="col">
+                  <div class="text-value">
+                    {{ totalAccesoMenu | number: "":"es-CO" }}
+                  </div>
+                  <div>Consultas por acceso a menú</div>
+                </div>
+                <div class="col-auto">
+                  <button type="button" class="btn p-0" (click)="tarjetaPagWeb()">
+                    <i class="icon-cloud-download iconDescargas"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="chart-wrapper mt-3 mx-3" style="height: 100px">
+              <canvas baseChart class="chart" [datasets]="lineChart2Data" [labels]="lineChart2Labels"
+                [options]="lineChart2Options" [colors]="lineChart2Colours" [legend]="lineChart2Legend"
+                [chartType]="lineChart2Type"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12" id="indicadoresInteraccion">
+          <div class="card shadow">
+            <div class="row no-gutters">
+              <div class="col-md-3 d-flex justify-content-center align-items-center p-3 p-md-0 bg_chec_oscuro">
+                <i class="fas fa-headphones fa-5x"></i>
+              </div>
+              <div class="col-md">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between mb-3">
+                    <h5 class="card-title m-0">Indicadores de interacción</h5>
+                    <button type="button" class="btn p-0" (click)="indicadoresInteraccion()">
+                      <i class="icon-cloud-download iconDescargas"></i>
+                    </button>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="card-text">
+                      <i class="fas fa-sign-in-alt fa-fw"></i>
+                      Acceso a submenú
+                    </span>
+                    <span class="card-text">
+                      {{ totalSubmenu | number: "":"es-CO" }}
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="card-text">
+                      <i class="fas fa-comments fa-fw"></i>
+                      Comentarios registrados
+                    </span>
+                    <span class="card-text">
+                      {{ totalComentarios | number: "":"es-CO" }}
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="card-text">
+                      <i class="fas fa-percent fa-fw"></i>
+                      Tasa de abandono
+                    </span>
+
+                    <span class="card-text">
+                      {{ tasaAbandono | number: "":"es-CO" }}%
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="card-text">
+                      <i class="fas fa-undo fa-fw"></i>
+                      Fallbacks
+                    </span>
+
+                    <span class="card-text">
+                      {{ fallback | number: "":"es-CO" }}
+                    </span>
+                  </div>
+
+                  <div class="d-flex align-items-center mb-2">
+                    <ng-container *ngIf="isLoadingFallbacks; else templateFallbacks">
+                      <span class="spinner-border spinner-border-sm blue_spinner mr-1">
+                      </span>
+                      Cargando conversaciones
+                    </ng-container>
+                    <ng-template #templateFallbacks>
+                      <button type="button" class="btn-success" mat-button [attr.data-toggle]="dataAtribute.toggle"
+                        [attr.data-target]="dataAtribute.target">
+                        Ver conversaciones
+                      </button>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6" id="calificaciones">
+      <div class="card shadow">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Calificación</h5>
+            </div>
+            <div>
+              <button type="button" class="btn p-0" (click)="calificaciones()">
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div [class.d-none]="!calificacionLucyTieneDatos">
+            <i class="fas fa-star fa-fw mr-1"></i>
+            Total calificaciones: {{ totalCalificacion | number: "":"es-CO" }}
+            <div class="chart-wrapper mt-3">
+              <canvas class="" #elementChartCalificaciones></canvas>
+            </div>
+          </div>
+          <ng-container *ngIf="!calificacionLucyTieneDatos">
+            <alerta-sin-resultados></alerta-sin-resultados>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12">
+      <table class="table table-responsive-sm table-striped table-outline shadow sort_white_arrow" id="topConsultas"
+        matSort matSortActive="NUMCONSULTAS" matSortDirection="desc" (matSortChange)="sortTablaTop($event)">
+        <thead class="bg_chec_oscuro rounded-top">
+          <tr>
+            <th class="border-0 d-flex justify-content-between px-3 pb-0">
+              <h5> </h5>
+              <h5>Top de usuarios que realizaron reportes o consultas</h5>
+              <button type="button" class="btn p-0" (click)="topConsultas()">
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </th>
+          </tr>
+          <tr>
+            <th mat-sort-header="NOMBRE" class="border-top-0">Nombre</th>
+            <th mat-sort-header="NIU" class="text-center border-top-0">
+              Cuenta
+            </th>
+            <th mat-sort-header="NUMCONSULTAS" class="border-top-0">
+              Consultas
+              <i class="fas fa-info-circle ml-1" data-toggle="tooltip"
+                title="Top de personas que realizan reportes o descargan la copia de su factura"></i>
+            </th>
+            <th mat-sort-header="MUNICIPIO" class="border-top-0">
+              Municipio
+            </th>
+            <th mat-sort-header="TYPE" class="border-top-0">
+              Tipo
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white" id="tbody">
+          <div *ngIf="isLoadingTop; else templateTablaMensajes" class="d-flex justify-content-center py-4">
+            <span class="spinner-border blue_spinner"></span>
+          </div>
+          <ng-template #templateTablaMensajes>
+            <ng-container *ngIf="datosOrdenadosTop.length; else templateTablaSinDatos">
+              <tr *ngFor="let datos of datosOrdenadosTop">
+                <td>
+                  <div>{{ datos.NOMBRE | titlecase }}</div>
+                </td>
+                <td>
+                  <strong>{{ datos.NIU }}</strong>
+                </td>
+                <td>
+                  <div class="clearfix">
+                    <div class="float-left">
+                      <strong>{{ datos.NUMCONSULTAS }}</strong>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="clearfix">
+                    <div class="float-left">
+                      <strong>{{ datos.MUNICIPIO }}</strong>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="clearfix">
+                    <div class="float-left">
+                      <strong>{{ datos.TYPE }}</strong>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+            <ng-template #templateTablaSinDatos>
+              <div class="p-3">
+                <alerta-sin-resultados></alerta-sin-resultados>
+              </div>
+            </ng-template>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card shadow" id="accesoMenu2">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div></div>
+        <div>
+          <h4>Opciones seleccionadas</h4>
+        </div>
+        <div>
+          <button type="button" class="btn p-0" (click)="accesoMenu2()">
+            <i class="icon-cloud-download iconDescargas"></i>
+          </button>
+        </div>
+      </div>
+      <!--/.row-->
+      <div class="chart-wrapper mt-2" style="height: 300px">
+        <canvas baseChart class="chart" [datasets]="mainChartData" [labels]="mainChartLabels"
+          [options]="mainChartOptions" [colors]="mainChartColours" legend="true" [chartType]="mainChartType"></canvas>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="row text-center overflow-auto" style="max-height: 250px">
+        <div *ngFor="let item of arrayItemsAccesoMenu" class="col-sm-12 col-md mb-sm-2 mb-0">
+          <div class="text-muted">{{ item.nombreItem }}</div>
+          <strong>
+            {{ item.cantidadAccesos | number: "":"es-CO" }}
+          </strong>
+          <small> ({{ item.porcentajeAccesos }}%) </small>
+          <div class="progress progress-xs bg-secondary mt-2">
+            <div class="progress-bar" role="progressbar" [style.width.%]="item.porcentajeAccesos"
+              [style.backgroundColor]="item.colorFondo" [attr.aria-valuenow]="item.porcentajeAccesos" aria-valuemin="0"
+              aria-valuemax="100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--/.row-->
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" (click)="changeColor(); mostrarchat = false">
+              <a class="nav-link {{ !mostrarchat ? 'show active' : '' }}" id="home-tab" data-toggle="tab" href="#home"
+                role="tab" aria-controls="home" aria-selected="true">Chats</a>
+            </li>
+            <li class="nav-item" [style.background-color]="color">
+              <a class="nav-link {{ mostrarchat ? 'show active' : '' }}" id="profile-tab" data-toggle="tab"
+                href="#profile" role="tab" aria-controls="profile" aria-selected="false">Conversación</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade p-0 {{ !mostrarchat ? 'show active' : '' }}" id="home" role="tabpanel"
+              aria-labelledby="home-tab">
+              <div id="chatsSeguimento">
+                <ng-container *ngIf="
+                  conversaciones.length;
+                  else templateInfoConversacioneSinDatos
+                ">
+                  <div *ngFor="let conversacion of conversaciones"
+                    class="d-flex justify-content-around align-items-center cursor_pointer" id="chats"
+                    (click)="selectConversation(conversacion)">
+                    <div>
+                      <i class="fas fa-user-circle fa-3x"></i>
+                    </div>
+                    <div id="fechaConversacion">
+                      <div class="fechaConversacion">
+                        {{
+                        conversacion.fecha
+                          | date: "MMMM dd, yyyy":"":"es-CO"
+                          | titlecase
+                      }}
+                      </div>
+                    </div>
+                    <div id="horaConversacion">
+                      {{ conversacion.fecha | date: "hh:mm a" }}
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-template #templateInfoConversacioneSinDatos>
+                  <div class="p-3">
+                    <alerta-sin-resultados></alerta-sin-resultados>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+
+            <!-- Contenido conversación -->
+            <div class="tab-pane fade {{ mostrarchat ? 'show active' : '' }}" id="profile" role="tabpanel"
+              aria-labelledby="profile-tab">
+              <ng-container *ngIf="conversaciones.length; else templateConversacioneSinDatos">
+                <div class="message-content">
+                  <div class="messages-headline">
+                    <img id="iconoLucy" src="./assets/img/lucy.jpg" alt="" />
+                    <h1 id="nombreCabecera">CHEC Grupo EPM</h1>
+                    <a class="message-action">
+                      <i class="icon-feather-trash-2"></i>
+                    </a>
+                  </div>
+                  <!-- Message Content Inner  mostrarchat -->
+                  <div class="message-content-inner">
+                    <div *ngFor="let message of messages" class="message-bubble">
+                      <div *ngIf="message.type != 'text'" [ngClass]="{ me: message.sentBy === 'human' }"
+                        class="message-bubble">
+                        <div class="message-bubble-inner">
+                          <div class="message-avatar">
+                            <img [src]="
+                              message.sentBy === 'human'
+                                ? message.userImg
+                                : message.botImg
+                            " alt="" />
+                          </div>
+                          <div class="message-text">
+                            <div id="contImg">
+                              <div *ngIf="message.imageUrl && imagenDescarga" #ovalo id="ovalo"></div>
+                              <img *ngIf="message.imageUrl && imagenDescarga" #descarga [src]="cargaYdescarga"
+                                id="descarga" />
+                              <img *ngIf="message.imageUrl" [src]="message.imageUrl" class="imgweb" />
+                            </div>
+                            <p>{{ message.text }}</p>
+                            <span *ngIf="!message.chips" id="hora">{{
+                            today | date: "shortTime"
+                          }}</span>
+                            <p *ngIf="message.webUrl">
+                              <small><a target="__blank" [href]="message.webUrl">Click aquí para abrir este
+                                  enlace</a></small>
+                            </p>
+                            <div *ngIf="message.chips && message.chips.length">
+                              <span *ngFor="let c of message.chips" class="chip">{{ c.text }}</span>
+                              <span id="hora">{{
+                              today | date: "shortTime"
+                            }}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Message Content Inner / End -->
+                </div>
+              </ng-container>
+              <ng-template #templateConversacioneSinDatos>
+                <div class="p-3">
+                  <alerta-sin-resultados></alerta-sin-resultados>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<div class="app-body min-vh-100 mt-0">
+  <main class="main d-flex">
+    <div class="container">
+      <img
+        src="assets/img/chec_logo.png"
+        class="img-fluid d-block mx-auto mt-5 mb-2"
+        alt="CHEC"
+      />
+      <div class="row">
+        <div class="col-md-5 mx-auto mt-3">
+          <div
+            *ngIf="!isEmailRegistered"
+            class="d-flex align-items-center alert bg-danger px-2 py-1"
+            role="alert"
+          >
+            <span class="mr-2 iconSize">
+              <i class="fas fa-exclamation-circle"></i>
+            </span>
+            <span>
+              {{ msjCorreoPasswordIncorrectos }}
+            </span>
+          </div>
+
+          <div
+            *ngIf="isFromNuevoPassword"
+            class="d-flex align-items-center alert bg-success px-2 py-1"
+            role="alert"
+          >
+            <span class="mr-2 iconSize">
+              <i class="fas fa-check-circle"></i>
+            </span>
+            <span>
+              {{ MESSAGES.passwordActualizado }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-5 mx-auto">
+          <div class="card-group shadow">
+            <div class="card p-4">
+              <div class="card-body">
+                <form [formGroup]="formLogin" (ngSubmit)="login()">
+                  <h3>Sistema de Gestión de la Comunicación Bidireccional</h3>
+                  <p class="text-muted">Ingresa a tu cuenta</p>
+                  <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"
+                        ><i class="fas fa-envelope fa-fw"></i
+                      ></span>
+                    </div>
+                    <input
+                      type="email"
+                      formControlName="correo"
+                      id="correo"
+                      name="correo"
+                      class="form-control"
+                      placeholder="Correo electrónico"
+                    />
+                    <span
+                      *ngIf="
+                        formFields.correo.invalid &&
+                        (formFields.correo.dirty || formFields.correo.touched)
+                      "
+                      class="text-danger pos_texto_error texto_pequeno"
+                    >
+                      <span *ngIf="formFields.correo.errors.required">
+                        {{ MESSAGES.requerido }}
+                      </span>
+                      <span *ngIf="formFields.correo.errors.email">
+                        {{ MESSAGES.email }}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"
+                        ><i class="fas fa-lock fa-fw"></i
+                      ></span>
+                    </div>
+                    <input
+                      type="password"
+                      formControlName="password"
+                      id="password"
+                      name="password"
+                      class="form-control"
+                      placeholder="Contraseña"
+                    />
+                    <span
+                      *ngIf="
+                        formFields.password.invalid &&
+                        (formFields.password.dirty ||
+                          formFields.password.touched)
+                      "
+                      class="text-danger pos_texto_error texto_pequeno"
+                    >
+                      <span *ngIf="formFields.password.errors.required">
+                        {{ MESSAGES.requerido }}
+                      </span>
+                    </span>
+                  </div>
+                  <div class="row align-items-center">
+                    <div class="col">
+                      <!-- Si el campo Correo tiene algún valor, se envía como parámetro por URL, sino, no se envía nada -->
+                      <a
+                        [routerLink]="['/recuperarCuenta']"
+                        [queryParams]="
+                          formFields.correo.value
+                            ? { correo: formFields.correo.value }
+                            : null
+                        "
+                        >¿Olvidaste tu contraseña?</a
+                      >
+                    </div>
+                    <div class="col">
+                      <span class="d-flex justify_content_flex_end">
+                        <button type="submit" class="bg_chec_oscuro px-4" mat-button>
+                          Ingresar
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

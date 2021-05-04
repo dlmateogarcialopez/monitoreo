@@ -1,0 +1,110 @@
+<div class="app-body min-vh-100 mt-0">
+  <main class="main d-flex">
+    <div class="container">
+      <img
+        src="assets/img/chec_logo.png"
+        class="img-fluid d-block mx-auto mt-5 mb-2"
+        alt="CHEC"
+      />
+      <div class="row">
+        <div class="col-md-5 mx-auto mt-3">
+          <div
+            *ngIf="!isEmailRegistered || isLinkInvalidFromNuevoPassword"
+            class="d-flex align-items-center alert bg-danger px-2 py-1"
+            role="alert"
+          >
+            <span class="mr-2 iconSize">
+              <i class="fas fa-exclamation-circle"></i>
+            </span>
+            <span>
+              <ng-container *ngIf="!isEmailRegistered; else linkInvalid">
+                {{ msgEmailNotFound }}
+              </ng-container>
+              <ng-template #linkInvalid>
+                {{ MESSAGES.enlaceNoValido }}
+              </ng-template>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-5 mx-auto">
+          <div class="card-group shadow">
+            <div class="card p-4">
+              <div class="card-body">
+                <ng-container *ngIf="!isEmailSent; else correoEnviado">
+                  <!--
+                  <div
+                    *ngIf="isLinkInvalidFromNuevoPassword"
+                    class="d-flex align-items-center alert alert-danger px-2 py-1"
+                    role="alert"
+                  >
+                    <span class="mr-2 iconSize">
+                      <i class="fas fa-exclamation-circle"></i>
+                    </span>
+                    <span>
+                      {{ MESSAGES.enlaceNoValido }}
+                    </span>
+                  </div> -->
+                  <form
+                    [formGroup]="formRecuperarCuenta"
+                    (ngSubmit)="recuperarCuenta()"
+                  >
+                    <h3>Recuperar cuenta</h3>
+                    <p class="text-muted">
+                      Ingresa tu dirección de correo electrónico
+                    </p>
+                    <div class="input-group mb-4">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"
+                          ><i class="fas fa-envelope"></i
+                        ></span>
+                      </div>
+                      <input
+                        type="email"
+                        formControlName="correo"
+                        id="correo"
+                        name="correo"
+                        class="form-control"
+                        placeholder="Correo electrónico"
+                      />
+                      <span
+                        *ngIf="
+                          correo.invalid && (correo.dirty || correo.touched)
+                        "
+                        class="text-danger pos_texto_error texto_pequeno"
+                      >
+                        <span *ngIf="correo.errors.required">
+                          {{ MESSAGES.requerido }}
+                        </span>
+                        <span *ngIf="correo.errors.email">
+                          {{ MESSAGES.email }}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div class="row justify_content_flex_end">
+                      <div class="col-auto">
+                        <button type="submit" class="bg_chec_oscuro px-4" mat-button>
+                          Enviar
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </ng-container>
+                <ng-template #correoEnviado>
+                  <p class="mb-3">
+                    Se ha enviado un mensaje a tu dirección de correo
+                    electrónico. Haz clic en el enlace que allí aparece para
+                    restablecer tu contraseña.
+                  </p>
+                  <a [routerLink]="['/login']">Volver a inicio de sesión</a>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

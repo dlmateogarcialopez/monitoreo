@@ -1,0 +1,549 @@
+<div class="jumbotron px-4 canvas_div_pdf" [hidden]="!isVistaCargada">
+  <div class="d-flex justify-content-between align-items-center">
+    <div></div>
+    <h1 class="text-center m-0">Monitoreo Lucy - Falta de energía</h1>
+    <button type="button" class="btn p-0" (click)="getPDF()">
+      <i class="icon-cloud-download iconDescargas"></i>
+    </button>
+  </div>
+
+  <hr class="w-50" />
+
+  <div class="row mt-5 mb-3">
+    <div class="col-sm-4 col-md-3">
+      <form [formGroup]="dateForm">
+        <mat-form-field class="w-100">
+          <mat-label>Periodo</mat-label>
+          <input
+            matInput
+            [satDatepicker]="picker"
+            formControlName="date"
+            (dateChange)="change()"
+          />
+          <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+          <sat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></sat-datepicker-toggle>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <div class="col-sm-4 col-md-3">
+      <mat-form-field class="w-100">
+        <mat-label>Municipio</mat-label>
+        <mat-select [(ngModel)]="municipio" (selectionChange)="change()">
+          <mat-option value="Todos">Todos</mat-option>
+          <mat-option
+            *ngFor="let item of municipios"
+            [value]="item.MUNICIPIO"
+            >{{ item.MUNICIPIO }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-sm-4 col-md-3">
+      <mat-form-field class="w-100">
+        <mat-label>Ubicación</mat-label>
+        <mat-select [(ngModel)]="ubicacion" (selectionChange)="change()">
+          <mat-option value="Todos">Todos</mat-option>
+          <mat-option value="u">Urbano</mat-option>
+          <mat-option value="r">Rural</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!--
+        <div class="form-group col-sm-6">
+          <label for="ccmonth">Año</label>
+          <select class="form-control" name="miselect" [(ngModel)]="municipio" (change)="change()">
+            <option value="Todos">Todos</option>
+            <option [value]="item.MUNICIPIO" *ngFor="let item of municipios">{{item.MUNICIPIO}}</option>
+          </select>
+        </div>
+      -->
+    <!--
+        <div class="form-group col-sm-6">
+          <label for="ccyear">Mes</label>
+          <select class="form-control" name="miselect" [(ngModel)]="ubicacion" (change)="change()">
+            <option value="Todos">Todos</option>
+            <option value="u">Urbano</option>
+            <option value="r">Rural</option>
+          </select>
+        </div>
+      -->
+  </div>
+  <!--
+      <div class="row col-lg-8 d-flex flex-column ml-3">
+        <div class="d-flex flex-end">
+          <label for="ccmonth">Selecciona período de tiempo</label>
+        </div>
+        <div class="d-flex">
+          <input class="form-control col-lg-4" ngxDaterangepickerMd matInput opens='right' showCancel="true"
+          placeholder="Selecciona una Fecha" [(ngModel)]="selected" [showDropdowns]="true" [lockStartDate]="false"
+          [customRangeDirection]="false" (change)="change()" />
+          <label class="icon-date-range-picker-icon fa fa-calendar"></label>
+        </div>
+      </div>
+    -->
+
+  <div class="row justify-content-center mt-3 mb-2">
+    <div class="col-md-6" id="paginaWeb">
+      <div class="card shadow">
+        <div class="card-body pb-0">
+          <div class="row">
+            <div class="col">
+              <div class="text-value">
+                {{ reportes_consultas_totales | number: "":"es-CO" }}
+              </div>
+              <div>Consultas por falta de energía</div>
+            </div>
+            <div class="col-auto">
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('paginaWeb')"
+              >
+                <i class="icon-cloud-download iconDescargas"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrapper m-3" style="height: 100px">
+          <canvas
+            baseChart
+            class="chart"
+            [datasets]="lineChart3Data"
+            [labels]="lineChart3Labels"
+            [options]="lineChart3Options"
+            [colors]="lineChart3Colours"
+            [legend]="lineChart3Legend"
+            [chartType]="lineChart3Type"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6" id="paginaWeb">
+      <div class="card shadow">
+        <div class="card-body pb-0">
+          <div class="row">
+            <div class="col">
+              <div class="text-value">
+                {{ reportesTotales | number: "":"es-CO" }}
+              </div>
+              <div>Reportes de falta de energía</div>
+            </div>
+            <div class="col-auto">
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('paginaWeb')"
+              >
+                <i class="icon-cloud-download iconDescargas"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrapper m-3" style="height: 100px">
+          <canvas
+            baseChart
+            class="chart"
+            [datasets]="lineChart1Data"
+            [labels]="lineChart1Labels"
+            [options]="lineChart1Options"
+            [colors]="lineChart1Colours"
+            [legend]="lineChart1Legend"
+            [chartType]="lineChart1Type"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="col-lg-4">
+          <div class="card  shadow" id="telegram">
+            <div class="card-body pb-0">
+              <button type="button" class="btn p-0 float-right">
+                <i (click)="faltaDeEnergiaGraficas('telegram')" class="icon-cloud-download iconDescargas"></i>
+              </button>
+              <div class="d-flex flex-column float-left">
+                <div class="text-value text-left">{{reportesTelegram}}</div>
+                <div style="text-align: center;">Reportes por Telegram</div>
+              </div>
+            </div>
+            <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+              <canvas baseChart class="chart" [datasets]="lineChart2Data" [labels]="lineChart2Labels"
+                [options]="lineChart2Options" [colors]="lineChart2Colours" [legend]="lineChart2Legend"
+                [chartType]="lineChart2Type"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4" id="reportes">
+          <div class="card  shadow">
+            <div class="card-body pb-0">
+              <button type="button" class="btn p-0 float-right">
+                <i (click)="faltaDeEnergiaGraficas('reportes')" class="icon-cloud-download iconDescargas"></i>
+              </button>
+              <div class="d-flex flex-column float-left">
+                <div class="text-value text-left">{{reportes}}</div>
+                <div style="text-align: center;">Reportes totales</div>
+              </div>
+            </div>
+            <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+              <canvas baseChart class="chart" [datasets]="lineChart3Data" [labels]="lineChart3Labels"
+                [options]="lineChart3Options" [colors]="lineChart3Colours" [legend]="lineChart3Legend"
+                [chartType]="lineChart3Type"></canvas>
+            </div>
+          </div>
+        </div> -->
+  </div>
+  <div class="animated fadeIn">
+    <div class="card shadow">
+      <div class="card-header bg_chec_oscuro">
+        <h5 class="text-center m-0 p-0">Consultas por criterio de búsqueda</h5>
+      </div>
+      <div class="card-body">
+        <div
+          class="mid-graph"
+          [class.d-none]="!sankeyTieneDatos"
+          id="sankey"
+        ></div>
+        <ng-container *ngIf="!sankeyTieneDatos">
+          <alerta-sin-resultados></alerta-sin-resultados>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="row my-3">
+    <div class="animated fadeIn col-lg-6" id="mapaFaltaEnergia">
+      <div class="card shadow">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Consultas por municipio</h5>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('mapaFaltaEnergia')"
+              >
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body overflow-auto d-flex justify-content-center p-0">
+          <svg class="mapa" id="mapa"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <table
+        class="table table-responsive-sm table-striped sort_white_arrow"
+        id="tablaMunicipio"
+        matSort
+        matSortActive="num"
+        matSortDirection="desc"
+        (matSortChange)="sortTablaMunicipios($event)"
+      >
+        <thead class="bg_chec_oscuro shadow rounded-top">
+          <tr>
+            <th class="border-0 float-right px-3 pb-0">
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('tablaMunicipio')"
+              >
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </th>
+          </tr>
+
+          <tr>
+            <th mat-sort-header="municipio" class="border-top-0">Municipio</th>
+            <th mat-sort-header="num" class="text-center border-top-0">
+              Consultas
+            </th>
+            <th mat-sort-header="porUrbano" class="border-top-0">
+              % Urbano
+              <i
+                class="fas fa-info-circle ml-1"
+                data-toggle="tooltip"
+                title="Porcentaje de reportes con respecto al total general de reportes hechos por ubicación urbano"
+              ></i>
+            </th>
+            <th mat-sort-header="porRural" class="border-top-0">
+              % Rural
+              <i
+                class="fas fa-info-circle ml-1"
+                data-toggle="tooltip"
+                title="Porcentaje de reportes con respecto al total general de reportes hechos por ubicación rural"
+              ></i>
+            </th>
+            <th mat-sort-header="porReporte" class="border-top-0">
+              % Reportes
+              <i
+                class="fas fa-info-circle ml-1"
+                data-toggle="tooltip"
+                title="Porcentaje de reportes con respecto al total general de reportes hechos"
+              ></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white shadow" id="tbody">
+          <ng-container *ngIf="datosOrdenadosTablaMunicipio.length; else templateTablaSinDatos">
+            <tr *ngFor="let datos of datosOrdenadosTablaMunicipio">
+              <td>
+                <div>{{ datos.municipio | titlecase }}</div>
+              </td>
+              <td class="text-center">
+                <strong>{{ datos.num | number: "":"es-CO" }}</strong>
+              </td>
+              <td>
+                <div class="clearfix">
+                  <div class="float-left">
+                    <strong>{{ datos.porUrbano }}%</strong>
+                  </div>
+                </div>
+                <div class="progress progress-xs bg-secondary">
+                  <div
+                    class="progress-bar bg-primary"
+                    role="progressbar"
+                    [style.width.%]="datos.porUrbano"
+                    [attr.aria-valuenow]="datos.porUrbano"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+              </td>
+              <td>
+                <div class="clearfix">
+                  <div class="float-left">
+                    <strong>{{ datos.porRural }}%</strong>
+                  </div>
+                </div>
+                <div class="progress progress-xs bg-secondary">
+                  <div
+                    class="progress-bar bg-primary"
+                    role="progressbar"
+                    [style.width.%]="datos.porRural"
+                    [attr.aria-valuenow]="datos.porRural"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+              </td>
+              <td>
+                <div class="clearfix">
+                  <div class="float-left">
+                    <strong>{{ datos.porReporte }}%</strong>
+                  </div>
+                </div>
+                <div class="progress progress-xs bg-secondary">
+                  <div
+                    class="progress-bar bg-success"
+                    role="progressbar"
+                    [style.width.%]="datos.porReporte"
+                    [attr.aria-valuenow]="datos.porReporte"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <ng-template #templateTablaSinDatos>
+            <tr>
+              <td>
+                <alerta-sin-resultados></alerta-sin-resultados>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row animated fadeIn mb-2">
+    <div class="col-md-6">
+      <div class="card shadow" id="consultasSegmento">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Consultas hechas por Segmento</h5>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('consultasSegmento')"
+              >
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <ng-container
+            *ngIf="
+              consultasSegmentoTieneDatos;
+              else templateConsultasSegmentoSinDatos
+            "
+          >
+            <div class="chart-wrapper">
+              <canvas
+                baseChart
+                class="chart"
+                [colors]="doughnutChartColours3"
+                [data]="doughnutChartData3"
+                [labels]="doughnutChartLabels3"
+                [chartType]="doughnutChartType3"
+              ></canvas>
+            </div>
+          </ng-container>
+          <ng-template #templateConsultasSegmentoSinDatos>
+            <alerta-sin-resultados></alerta-sin-resultados>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow" id="consultasUbicacion">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Consultas hechas por Ubicación</h5>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('consultasUbicacion')"
+              >
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <ng-container
+            *ngIf="
+              consultasUbicacionTieneDatos;
+              else templateConsultasUbicacionSinDatos
+            "
+          >
+            <div class="chart-wrapper">
+              <canvas
+                baseChart
+                class="chart"
+                [colors]="doughnutChartColours4"
+                [data]="doughnutChartData4"
+                [labels]="doughnutChartLabels4"
+                [chartType]="doughnutChartType4"
+              ></canvas>
+            </div>
+          </ng-container>
+          <ng-template #templateConsultasUbicacionSinDatos>
+            <alerta-sin-resultados></alerta-sin-resultados>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row animated fadeIn mb-2">
+    <div class="col-md-6">
+      <div class="card shadow" id="reportesSegmentos">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Reportes hechos por Segmento</h5>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('reportesSegmentos')"
+              >
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <ng-container
+            *ngIf="
+              reportesSegmentoTieneDatos;
+              else templateReportesSegmentoSinDatos
+            "
+          >
+            <div class="chart-wrapper">
+              <canvas
+                baseChart
+                class="chart"
+                [colors]="doughnutChartColours"
+                [data]="doughnutChartData"
+                [labels]="doughnutChartLabels"
+                [chartType]="doughnutChartType"
+              ></canvas>
+            </div>
+          </ng-container>
+          <ng-template #templateReportesSegmentoSinDatos>
+            <alerta-sin-resultados></alerta-sin-resultados>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow" id="reportesUbicacion">
+        <div class="card-header bg_chec_oscuro">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h5 class="m-0 p-0">Reportes hechos por Ubicación</h5>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn p-0"
+                (click)="faltaDeEnergiaGraficas('reportesUbicacion')"
+              >
+                <i class="icon-cloud-download iconDescargas text-white"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <ng-container
+            *ngIf="
+              reportesUbicacionTieneDatos;
+              else templateReportesUbicacionSinDatos
+            "
+          >
+            <div class="chart-wrapper">
+              <canvas
+                baseChart
+                class="chart"
+                [colors]="doughnutChartColours2"
+                [data]="doughnutChartData2"
+                [labels]="doughnutChartLabels2"
+                [chartType]="doughnutChartType2"
+              ></canvas>
+            </div>
+          </ng-container>
+          <ng-template #templateReportesUbicacionSinDatos>
+            <alerta-sin-resultados></alerta-sin-resultados>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

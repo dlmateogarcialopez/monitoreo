@@ -1,0 +1,181 @@
+<div class="jumbotron" *ngIf="isVistaCargada">
+  <div class="text-center px-4">
+    <h1 class="text-center m-0">Monitoreo general</h1>
+    <hr class="w-50" />
+
+    <div class="card shadow mt-5" id="tablaGeneral">
+      <div class="card-body">
+        <div class="row justify-content-between">
+          <div class="col-md-1">
+            <button type="button" class="btn p-0">
+              <i (click)="general('tablaGeneral')" class="icon-cloud-download iconDescargas"></i>
+            </button>
+          </div>
+          <div class="col-md-6">
+            <h4 class="card-title mb-0">
+              Comparación con fuentes por {{ flag }}
+            </h4>
+          </div>
+
+          <!--/.col-->
+          <div class="col-md-auto">
+            <div class="d-flex flex-column">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-dark" [class.btn-secondary]="mes"
+                  (click)="clicked = true; tablaMes()">
+                  Mes
+                </button>
+                <button type="button" class="btn btn-outline-dark" [class.btn-secondary]="semana"
+                  (click)="tablaSemana()">
+                  Semana
+                </button>
+                <button type="button" [class.btn-secondary]="dia" class="btn btn-outline-dark" (click)="tablaDia()">
+                  Día
+                </button>
+                <button type="button" [class.btn-secondary]="hora" class="btn btn-outline-dark" (click)="tablaHora()">
+                  Hora
+                </button>
+              </div>
+
+              <!--meses-->
+              <div *ngIf="mes == true" class="btn-group" role="group">
+                <!-- [class.btn-secondary]="getMes === 'cantidad'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarMes('cantidad')" #cantidadMes>
+                  Cantidad
+                </button>
+                <!-- [class.btn-secondary]="getMes === 'costos'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarMes('costos')">
+                  Costos
+                </button>
+              </div>
+              <div *ngIf="calendarMes == true" class="mt-2">
+                <mat-form-field>
+                  <mat-label>Año</mat-label>
+                  <input matInput [matDatepicker]="dp" [formControl]="date" />
+                  <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                  <mat-datepicker #dp startView="multi-year" (yearSelected)="changeMes($event, dp)"
+                    panelClass="example-month-picker">
+                  </mat-datepicker>
+                </mat-form-field>
+                <!--<button *ngIf="calendarMes==true" class="btn btn-success" (click)="changeMes($event, dp)">mes</button>-->
+              </div>
+              <!--meses-->
+
+              <!--dias-->
+              <div *ngIf="dia == true" class="btn-group" role="group">
+                <!-- [class.btn-secondary]="getDia === 'cantidad'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarDia('cantidad')">
+                  Cantidad
+                </button>
+                <!-- [class.btn-secondary]="getDia === 'costos'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarDia('costos')">
+                  Costos
+                </button>
+              </div>
+              <div *ngIf="calendarDia == true" class="mt-2">
+                <mat-form-field>
+                  <mat-label>Año</mat-label>
+                  <input matInput [matDatepicker]="dp" [formControl]="date" />
+                  <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                  <mat-datepicker #dp startView="multi-year" (yearSelected)="chosenYearHandler2($event)"
+                    (monthSelected)="chosenMonthHandler($event, dp)" panelClass="example-month-picker">
+                  </mat-datepicker>
+                </mat-form-field>
+                <!--
+                <button *ngIf="calendarDia==true" class="btn btn-success" (click)="changeDia()">Dia</button>
+              -->
+              </div>
+              <!--dias-->
+
+              <!--semanas-->
+              <div *ngIf="semana == true" class="btn-group" role="group">
+                <!-- [class.btn-secondary]="getSemana === 'cantidad'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarSemana('cantidad')">
+                  Cantidad
+                </button>
+                <!-- [class.btn-secondary]="getSemana === 'costos'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarSemana('costos')">
+                  Costos
+                </button>
+              </div>
+              <form *ngIf="calendarSemana == true" [formGroup]="dateForm">
+                <mat-form-field>
+                  <input disabled="{{ habilitarCalendario }}" matInput placeholder="Fecha" [satDatepicker]="picker"
+                    formControlName="date" (dateChange)="changeSemana()" />
+                  <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+                  <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+                </mat-form-field>
+              </form>
+              <!--semanas-->
+
+              <!--horas-->
+              <div *ngIf="hora == true" class="btn-group" role="group">
+                <!-- [class.btn-secondary]="getHora === 'cantidad'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarHora('cantidad')">
+                  Cantidad
+                </button>
+                <!-- [class.btn-secondary]="getHora === 'costos'" -->
+                <button type="button" class="btn btn-outline-dark" (click)="getCalendarHora('costos')">
+                  Costos
+                </button>
+              </div>
+              <form *ngIf="calendar == true" [formGroup]="dateForm">
+                <mat-form-field>
+                  <input disabled="{{ habilitarCalendario }}" matInput placeholder="Fecha" [satDatepicker]="picker"
+                    formControlName="date" (dateChange)="changeHora()" />
+                  <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+                  <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+                </mat-form-field>
+              </form>
+              <!--horas-->
+            </div>
+          </div>
+        </div>
+        <!--/.row-->
+        <div class="chart-wrapper" style="height: 300px; margin-top: 40px">
+          <canvas baseChart class="chart" [datasets]="mainChartData" [labels]="mainChartLabels"
+            [options]="mainChartOptions" [colors]="mainChartColours" legend="true" [chartType]="mainChartType"></canvas>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="row text-center">
+          <div class="col-sm-12 col-md mb-sm-2 mb-0">
+            <div class="text-muted">Consultas Lucy</div>
+            <div class="progress progress-xs mt-2">
+              <div class="progress-bar w-100" role="progressbar"
+                [style.backgroundColor]="mainChartColours[0].borderColor"></div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md mb-sm-2 mb-0">
+            <div class="text-muted">DINP</div>
+            <div class="progress progress-xs mt-2">
+              <div class="progress-bar w-100" role="progressbar"
+                [style.backgroundColor]="mainChartColours[1].borderColor"></div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md mb-sm-2 mb-0">
+            <div class="text-muted">Llamadas</div>
+            <div class="progress progress-xs mt-2">
+              <div class="progress-bar w-100" role="progressbar"
+                [style.backgroundColor]="mainChartColours[2].borderColor"></div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md mb-sm-2 mb-0">
+            <div class="text-muted">Turnos</div>
+            <div class="progress progress-xs mt-2">
+              <div class="progress-bar w-100" role="progressbar"
+                [style.backgroundColor]="mainChartColours[3].borderColor"></div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md mb-sm-2 mb-0">
+            <div class="text-muted">Avisos interr. programadas</div>
+            <div class="progress progress-xs mt-2">
+              <div class="progress-bar w-100" role="progressbar"
+                [style.backgroundColor]="mainChartColours[4].borderColor"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

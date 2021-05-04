@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Josefin+Slab|Arvo|Lato|Vollkorn|Abril+Fatface|Old+Standard+TT|Droid+Sans|Lobster|Inconsolata|Montserrat|Playfair+Display|Karla|Alegreya|Libre+Baskerville|Merriweather|Lora|Archivo+Narrow|Neuton|Signika|Questrial|Fjalla+One|Bitter|Varela+Round);
+
+
+div.tooltip { 
+    position: absolute;     
+    text-align: center;     
+    width:auto;          
+    height: 14px;         
+    padding: 2px;       
+    font: 12px sans-serif;    
+    background: #fff; 
+    border: 0px;        
+    pointer-events: none; 
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+    font-weight: bold;
+    margin: 0 auto;
+}
+path:hover {
+  fill: orange;
+}
+
+.background {
+  fill: #eee;
+  pointer-events: all;
+}
+
+.map-layer {
+  fill: #fff;
+  stroke: #aaa;
+}
+
+.effect-layer{
+  pointer-events:none;
+}
+
+text{
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
+
+text.big-text{
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.effect-layer text, text.dummy-text{
+  font-size: 12px;
+}
+
+</style>
+<body>
+
+<svg></svg>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var width = 960,
+    height = 500,
+    centered;
+
+var tooltip = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);
+
+// Define color scale
+var color = d3.scale.linear()
+  .domain([1, 20])
+  .clamp(true)
+  .range(['#fff', '#409A99']);
+
+var projection = d3.geo.mercator()
+  .scale(13000)
+  // Center the Map in Colombia
+  .center([-74, 4.8])
+  .translate([width / 2, height / 2]);
+
+var path = d3.geo.path()
+  .projection(projection);
+
+// Set svg width & height
+var svg = d3.select('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Add background
+svg.append('rect')
+  .attr('class', 'background')
+  .attr('width', width)
+  .attr('height', height)
+
+
+var g = svg.append('g');
+
+var effectLayer = g.append('g')
+  .classed('effect-layer', true);
+
+var mapLayer = g.append('g')
+  .classed('map-layer', true);
+
+var dummyText = g.append('text')
+  .classed('dummy-text', true)
+  .attr('x', 10)
+  .attr('y', 30)
+  .style('opacity', 0);
+
+var bigText = g.append('text')
+  .classed('big-text', true)
+  .attr('x', 20)
+  .attr('y', 45);
+
+// Load map data
+//d3.json('map2.geojson', function(error, mapData) {
+//d3.json('Colombia.json', function(error, mapData) {
+
+d3.json('map2.geojson', function(error, mapData) {
+  var features = mapData;
+  //console.log(features);
+/*
+ features.forEach(function(feature) {
+   if(feature.geometry.type == "MultiPolygon") {
+     feature.geometry.coordinates.forEach(function(polygon) {
+        
+       polygon.forEach(function(ring) {
+         ring.reverse();
+       })
+     })
+   }
+   else if (feature.geometry.type == "Polygon") {
+     feature.geometry.coordinates.forEach(function(ring) {
+       ring.reverse();
+     })  
+   }
+ })
+console.log(JSON.stringify(features));*/
+
+
+  // Draw each province as a path
+  mapLayer.selectAll('path')
+      .data(features)
+    .enter().append('path')
+      .attr('d', path)
+      .attr('vector-effect', 'non-scaling-stroke')
+      .on("mouseover",function(d){
+        tooltip.transition()    
+        .duration(200)    
+        .style("opacity", .9);    
+        tooltip.html(d.properties.name)  
+        .style("left", (d3.event.pageX) + "px")   
+        .style("top", (d3.event.pageY - 28) + "px");  
+      })
+      .on("mouseout",function(d){
+        tooltip.transition()    
+        .duration(200)    
+        .style("opacity", .0);    
+        tooltip.html(d.properties.name)  
+        .style("left", (d3.event.pageX) + "px")   
+        .style("top", (d3.event.pageY - 28) + "px");  
+      })
+
+
+      /*.style('fill', fillFn)
+      .on('mouseover', mouseover)
+      .on('mouseout', mouseout)
+      .on('click', clicked);*/
+});
+
+
+
+</script>

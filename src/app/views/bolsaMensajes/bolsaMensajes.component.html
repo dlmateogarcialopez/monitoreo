@@ -1,0 +1,9 @@
+
+<span class="bg-success p-1">
+  <i class="fas fa-dollar-sign"></i>
+  {{ bolsaDineroMensajes | number }}
+</span>
+<span
+  *ngIf="isLoading"
+  class="spinner-border spinner-border-sm blue_spinner ml-1"
+></span>
